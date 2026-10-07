@@ -1,0 +1,49 @@
+{
+  "name": "hizen-susukino",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "images:prepare": "node scripts/prepare-images.mjs",
+    "og:make": "node scripts/make-og.mjs",
+    "journal:generate": "tsx scripts/journal/generate.ts",
+    "journal:dry-run": "cross-env DRY_RUN=1 tsx scripts/journal/generate.ts",
+    "journal:selftest": "tsx scripts/journal/selftest.ts",
+    "journal:audit": "tsx scripts/journal/audit.ts",
+    "seo:map": "tsx scripts/seo/keyword-map.ts",
+    "seo:audit": "tsx scripts/seo/audit.ts",
+    "site:check": "tsx scripts/check-site.ts",
+    "check": "npm run typecheck && npm run lint && npm run seo:audit && npm run journal:selftest && npm run journal:audit"
+  },
+  "dependencies": {
+    "budoux": "^0.9.3",
+    "gray-matter": "^4.0.3",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "cross-env": "^7.0.3",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.0",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "zod": "^4.6.5"
+  },
+  "engines": {
+    "node": ">=20.9"
+  }
+}

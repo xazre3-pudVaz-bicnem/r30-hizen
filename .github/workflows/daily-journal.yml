@@ -1,0 +1,101 @@
+# 季節の便り — 毎日1本を自動で書いて公開する
+#
+# 流れ: 題材を選ぶ → Claude に書かせる → 検査 → 通ったら content/journal/ にコミットして push
+#       → push を受けて Vercel が自動でビルド・公開（sitemap.xml にも自動で載る）
+#
+# ・検査を通らなかった日は、何もコミットしない（その日は公開しない）。このジョブは失敗として残る
+# ・必要な設定は、リポジトリの Secrets に ANTHROPIC_API_KEY を1つ登録するだけ
+# ・モデルを替えたいときは、リポジトリの Variables に CLAUDE_MODEL を登録する（省くと claude-haiku-4-5）
+# ・止めたいときは、Actions の画面でこのワークフローを「Disable」にする
+name: 季節の便り（毎日1本）
+
+on:
+  schedule:
+    # 毎日 09:17（日本時間）＝ 00:17 UTC。GitHub の都合で、実行が数十分〜数時間遅れることがある
+    - cron: "17 0 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "試し書き（検査まで行い、保存も公開もしない。原稿はログに出る）"
+        type: boolean
+        default: false
+      topic:
+        description: "題材の id を指定する（data/journal-topics.ts。空欄なら自動で選ぶ）"
+        type: string
+        default: ""
+      model:
+        description: "モデルを指定する（空欄なら Variables の CLAUDE_MODEL、無ければ claude-haiku-4-5）"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-journal
+  cancel-in-progress: false
+
+jobs:
+  write:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: キーが登録されているか
+        id: key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "ANTHROPIC_API_KEY が Secrets に登録されていません。何もせずに終わります。"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 依存を入れる
+        if: steps.key.outputs.ready == 'true'
+        run: npm ci
+
+      - name: 仕組みの自己点検（API は使わない）
+        if: steps.key.outputs.ready == 'true'
+        run: npm run journal:selftest
+
+      - name: 1本書く
+        id: write
+        if: steps.key.outputs.ready == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ inputs.model || vars.CLAUDE_MODEL }}
+          JOURNAL_TOPIC: ${{ inputs.topic }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '' }}
+        run: npm run journal:generate
+
+      - name: 公開する記事を、もう一度まとめて点検する
+        if: steps.key.outputs.ready == 'true' && !inputs.dry_run
+        run: |
+          npm run journal:audit
+          npm run seo:audit
+
+      - name: コミットして push（Vercel が自動で公開する）
+        if: steps.key.outputs.ready == 'true' && !inputs.dry_run
+        env:
+          TITLE: ${{ steps.write.outputs.title }}
+        run: |
+          git add content/journal
+          if git diff --cached --quiet; then
+            echo "新しい記事はありません。"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "journal: ${TITLE:-季節の便りを1本追加}"
+          # ほかの変更が先に入っていたら、取り込んでから送る
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
