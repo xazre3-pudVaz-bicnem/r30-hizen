@@ -89,18 +89,34 @@
 
 本番は `https://www.hizen-susukino.jp` です（Vercel につないであり、www なしの `hizen-susukino.jp` は www ありへ転送されます）。`r30-hizen.vercel.app` は確認用で、検索エンジンには載りません。
 
-残っていることが、優先度の高い順に4つあります。
+**公開の状態（2026-10-09）**：canonical・OGP 画像・sitemap・robots.txt・RSS は、本番のドメインを指しています。同日に修正を公開し、本番そのものに `npm run site:check` を掛けて 41 項目を確認しました。
+それまでの数日間は、これらがすべて旧サイトのドメイン（hizen-susukino.com）を指していました。本番の URL を、旧サイトと同じドメインだと見込んで決め打ちしていたためです（`next.config.ts` の `PRODUCTION_URL`）。
 
-1. **今回の修正を公開する（最優先）。**
-   2026-10-09 の時点で公開されているサイトは、canonical・OGP 画像・sitemap・robots.txt が、すべて**旧サイトのドメイン（hizen-susukino.com）**を指しています。検索エンジンに「正しい URL は旧サイトにある」と伝えている状態で、SNS で共有したときの画像も出ません。
-   原因は、本番の URL を旧サイトと同じドメインだと見込んで決め打ちしていたことです。コードは直してあります（`next.config.ts` の `PRODUCTION_URL`）。**push して公開されるまで、直りません。**
-   公開されたら `BASE=https://www.hizen-susukino.jp npm run site:check` で確かめてください。
-2. **旧サイトを、新しいサイトへ転送してもらう。**
+残っていることが、優先度の高い順に3つあります。いずれも、店舗または旧サイトの管理会社でないと進められないものです。
+
+1. **旧サイトを、新しいサイトへ転送してもらう。**
    旧サイト（`hizen-susukino.com`）は、いまもそのまま公開されています（2026-10-09 確認。トップ・コンセプト・コース・アクセスなど、すべて表示されます）。公式サイトが2つある状態で、検索結果での評価や被リンクは旧サイトに付いたままです。
-   旧サイトを管理している会社に、**すべての URL を `https://www.hizen-susukino.jp/` の同じパスへ 301 で転送**するよう依頼してください。`/concept.html` `/course.html` `/menu.html` などは、こちらの転送表（`next.config.ts` の `LEGACY_REDIRECTS`。10 本）が、内容の近いページへ送ります。
+   旧サイトを管理している会社に、**すべての URL を `https://www.hizen-susukino.jp/` の同じパスへ 301 で転送**するよう依頼してください（下に依頼文の例があります）。`/concept.html` `/course.html` `/menu.html` などは、こちらの転送表（`next.config.ts` の `LEGACY_REDIRECTS`。10 本）が、内容の近いページへ送ります（本番で動作を確認済み）。
    転送ができない場合は、旧サイトを閉じる前にご相談ください（閉じるだけだと、旧サイトへのリンクや検索結果が行き止まりになります）。
-3. **Search Console に新しいドメインを登録して、sitemap を送る。**
+2. **Search Console に新しいドメインを登録して、sitemap を送る。**
    `https://www.hizen-susukino.jp/sitemap.xml` を送信します。所有権の確認タグは、旧サイトのものを入れてあります。新しいドメインで確認が通らなければ、Search Console に表示されたタグの値をお知らせください（`data/restaurant.ts` の `googleSiteVerification` に入れます）。
-   旧サイトのプロパティがある場合は、2 の転送のあとに「アドレス変更」を届け出ると、切り替えが早く伝わります。
-4. **外に載っている公式サイトの URL を直す。**
+   旧サイトのプロパティがある場合は、1 の転送のあとに「アドレス変更」を届け出ると、切り替えが早く伝わります。
+3. **外に載っている公式サイトの URL を直す。**
    Google ビジネスプロフィールの「Web サイト」（C を参照。いまは旧サイト）。Instagram のプロフィール、一休・食べログに公式サイトの URL を載せている場合は、そちらも。
+
+### 旧サイトの管理会社への依頼文（例）
+
+> 件名：hizen-susukino.com の転送設定のお願い
+>
+> R-30 hizen の公式サイトを、新しいドメイン（<https://www.hizen-susukino.jp>）へ移しました。
+> つきましては、旧サイト（<https://hizen-susukino.com>）の**すべての URL を、新しいドメインの同じパスへ、301（恒久的な転送）で転送**していただけますでしょうか。
+>
+> 例）`https://hizen-susukino.com/` → `https://www.hizen-susukino.jp/`
+> 　　`https://hizen-susukino.com/course.html` → `https://www.hizen-susukino.jp/course.html`
+>
+> - パスとファイル名は、そのまま付けて転送してください（新しいサイトの側で、該当するページへ振り分けます）
+> - 302（一時的な転送）や、すべてをトップページへ送る設定ではなく、**301 で、パスを保ったまま**の転送をお願いします
+> - 転送は、少なくとも 1 年は続けてください
+> - 設定が難しい場合は、ドメインの移管や DNS の変更についてご相談させてください
+>
+> 参考：Amazon S3 の静的ウェブサイトホスティングをお使いの場合は、バケットの設定で、すべてのリクエストを別のホスト名（`www.hizen-susukino.jp`・https）へリダイレクトできます。
