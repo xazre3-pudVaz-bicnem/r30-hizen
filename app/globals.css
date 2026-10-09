@@ -3,12 +3,13 @@
 /*
   R-30 hizen のデザイントークン。
   色は「黒＋金」に寄せず、墨・生成り・ごく少量の鈍い真鍮で組む。
+  地は1色（墨）で通し、区画は余白と写真で分ける（帯の色を交互に替えない）。
   カスタムクラスは必ず @layer components の中に書く（レイヤーの外に書くと Tailwind のユーティリティを打ち消す）。
 */
 @theme {
   --color-ink: #0a0a0a; /* 地 */
-  --color-ink-2: #111111; /* 地（区画の切り替え） */
-  --color-ink-3: #161616; /* 写真の下地・表の見出し */
+  --color-ink-2: #111111; /* 地（フッターなど、ごく一部の切り替え） */
+  --color-ink-3: #161616; /* 写真の下地 */
   --color-line: #2a2825; /* 罫 */
   --color-paper: #f2efe9; /* 文字（見出し） */
   --color-paper-2: #d8d2c8; /* 文字（本文） */
@@ -24,29 +25,65 @@
 }
 
 @layer base {
+  :root {
+    /* 左右の余白 */
+    --gutter: 1.5rem;
+    /* 本文の器の最大幅 */
+    --wrap-max: 80rem;
+    /*
+      区画と区画のあいだの余白。
+      スマートフォン 112px ／ タブレット 123px ／ PC 164〜240px（幅 1024〜1536px）になる。
+    */
+    --gap: clamp(7rem, 16vw, 15rem);
+    /*
+      器の左右の端の位置（写真を片側だけ画面の端まで伸ばすときに使う）。
+      --edge は幅いっぱいの箱の直下で margin に、--edge-vw は格子の中の padding に使う
+      （% は「入れ物の幅」を指すので、格子のマスの中では画面の幅を基準にできないため）。
+    */
+    --edge: max(var(--gutter), calc((100% - var(--wrap-max)) / 2));
+    --edge-vw: max(var(--gutter), calc((100vw - var(--wrap-max)) / 2));
+    /*
+      写真を端まで伸ばす組み（PhotoEdge）で、文章の列に最低限ほしい幅。
+      左右の余白（器の端＋写真とのあいだ）に、本文 24rem を足したもの。
+      写真を広く取る組みは、1024px 付近と 1920px を超える画面で文章が 300px ほどに痩せるため、これで下支えする。
+    */
+    --edge-text-min: calc(var(--edge-vw) + clamp(3rem, 7vw, 7.5rem) + 24rem);
+  }
+  @media (min-width: 768px) {
+    :root {
+      --gutter: 4rem;
+    }
+  }
+  @media (min-width: 1280px) {
+    :root {
+      --gutter: 6rem;
+    }
+  }
+
   html {
     background: var(--color-ink);
     color: var(--color-paper-2);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* 固定のヘッダー（80px）の分。ページ内リンクの飛び先は、どれもこの下に来る（個々の要素では空けない） */
     scroll-padding-top: 5.5rem;
   }
 
+  /* 本文：スマートフォン 16px ／ PC 17px、行間 2.0 */
   body {
     font-family: var(--font-mincho);
-    font-size: 0.9375rem;
-    line-height: 2.15;
-    letter-spacing: 0.06em;
+    font-size: 1rem;
+    line-height: 2;
+    letter-spacing: 0.05em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     line-break: strict;
     overflow-wrap: anywhere;
   }
-
   @media (min-width: 768px) {
     body {
-      font-size: 1rem;
+      font-size: 1.0625rem;
     }
   }
 
@@ -91,81 +128,95 @@
 @layer components {
   /* ---- 器 ---------------------------------------------------------------- */
   .wrap {
-    width: min(100% - 2.5rem, 76rem);
+    width: min(100% - var(--gutter) * 2, var(--wrap-max));
     margin-inline: auto;
   }
-  @media (min-width: 768px) {
-    .wrap {
-      width: min(100% - 6rem, 76rem);
-    }
-  }
-  @media (min-width: 1280px) {
-    .wrap {
-      width: min(100% - 10rem, 76rem);
-    }
-  }
 
-  /* 読みものの幅 */
+  /* 読みものの幅（1行 30字ほど） */
   .measure {
-    max-width: 34em;
+    max-width: 32em;
   }
 
+  /* 区画。上下に余白の半分ずつを持つので、区画どうしのあいだは --gap になる */
   .section {
-    padding-block: clamp(5rem, 13vw, 11rem);
+    padding-block: calc(var(--gap) / 2);
   }
+  /* 案内の表など、詰めて見せたい区画 */
   .section-tight {
-    padding-block: clamp(4rem, 9vw, 7.5rem);
+    padding-block: calc(var(--gap) / 3);
   }
   /*
-    画面の外にある区画は、近づくまで描画しない（長いページの最初の処理を軽くする）。
-    中身は HTML にそのまま入っているので、検索エンジンにもページ内検索にも見える。
-    ページ内リンク（#id）の飛び先になる区画には .no-cv を付けて外す（飛んだ位置がずれるため）。
+    最初の表示のあいだだけ、画面の外にある区画の描画を後回しにする（最初の文字組みを軽くする）。
+    html に data-cv が付いているあいだだけ効く。付け外しは app/layout.tsx の CV_SCRIPT が行う。
+
+    この指定を「付けたまま」にしてはいけない。描く前の区画は仮の高さ（下の 48rem）で置かれるので、
+    ・再読み込みや「戻る」で、ブラウザが元の位置へ戻しても、見ていた場所から数百px ずれる
+    ・Safari では、上の区画があとから描かれたときに画面が跳ねる
+    （2026年10月の調査で、3つのブラウザすべてで確認した）
+    そのため CV_SCRIPT は、初めて開いたときにだけ data-cv を付け、表示が済んだら1区画ずつ data-cv-done を
+    付けて通常の描画に戻し、最後に data-cv を外す。再読み込み・「戻る」・# 付きの URL では最初から付けない。
+
+    記事の本文全体のように、中で節ごとに掛けている入れ物は .no-cv で外す。
   */
-  .section:not(.no-cv),
-  .section-tight:not(.no-cv) {
+  html[data-cv] .section:not(.no-cv):not([data-cv-done]),
+  html[data-cv] .section-tight:not(.no-cv):not([data-cv-done]) {
     content-visibility: auto;
-    contain-intrinsic-size: auto 60rem;
+    contain-intrinsic-size: auto 48rem;
+  }
+
+  /* 写真を片側だけ画面の端まで伸ばす。-l は左を器にそろえて右へ、-r は右を器にそろえて左へ */
+  .bleed-l {
+    margin-left: var(--edge);
+  }
+  .bleed-r {
+    margin-right: var(--edge);
   }
 
   /* ---- 文字 -------------------------------------------------------------- */
   .t-h1 {
-    font-size: clamp(1.5rem, 1.12rem + 1.7vw, 2.5rem);
-    line-height: 1.8;
+    font-size: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+    line-height: 1.85;
     letter-spacing: 0.14em;
   }
   .t-h2 {
-    font-size: clamp(1.3rem, 1.06rem + 1.05vw, 1.95rem);
+    font-size: clamp(1.3125rem, 1.13rem + 0.8vw, 1.75rem);
     line-height: 1.9;
     letter-spacing: 0.14em;
   }
   .t-h3 {
-    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+    font-size: clamp(1.0625rem, 1.02rem + 0.25vw, 1.1875rem);
     line-height: 1.9;
     letter-spacing: 0.1em;
   }
   .t-lead {
-    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
-    line-height: 2.2;
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+    line-height: 2.1;
     letter-spacing: 0.08em;
     color: var(--color-paper);
   }
+  /* 注記。本文より小さいのは、ここだけ */
   .t-note {
     font-size: 0.8125rem;
     line-height: 1.95;
     letter-spacing: 0.06em;
     color: var(--color-mute);
   }
+  @media (min-width: 768px) {
+    .t-note {
+      font-size: 0.875rem;
+    }
+  }
 
-  /* 小さな和文の見出しラベル（区画の名前） */
+  /* 区画の名前（小さな和文のラベル） */
   .label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
     line-height: 1.6;
-    letter-spacing: 0.32em;
+    letter-spacing: 0.3em;
     color: var(--color-mute);
   }
 
-  /* 欧文のラベル。数は絞る（店名は小文字のまま出すので、大文字への変換はしない） */
+  /* 欧文。使うのはロゴまわりと数字だけ（見出しには使わない） */
   .latin {
     font-family: var(--font-latin);
     font-weight: 500;
@@ -215,8 +266,8 @@
     gap: 1.1em;
     min-height: 2.75rem;
     color: var(--color-paper);
-    font-size: 0.875rem;
-    letter-spacing: 0.2em;
+    font-size: 0.9375rem;
+    letter-spacing: 0.18em;
   }
   .more::after {
     content: "";
@@ -234,7 +285,7 @@
     background: var(--color-brass);
   }
 
-  /* 予約などの行動。枠は細い線だけ、角は立てる */
+  /* 予約の行動。枠は細い線だけ、角は立てる。塗りや光は使わない */
   .action {
     display: inline-flex;
     align-items: center;
@@ -244,9 +295,9 @@
     padding: 0.5rem 2.25rem;
     border: 1px solid rgb(242 239 233 / 0.3);
     color: var(--color-paper);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     line-height: 1.6;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     text-align: center;
     transition: border-color 0.5s var(--ease-quiet), background-color 0.5s var(--ease-quiet);
   }
@@ -270,9 +321,9 @@
   }
   .facts > div {
     display: grid;
-    grid-template-columns: 6.5em minmax(0, 1fr);
+    grid-template-columns: 5.5em minmax(0, 1fr);
     gap: 1.25rem;
-    padding-block: 1.15rem;
+    padding-block: 1.1rem;
     border-top: 1px solid var(--color-line);
   }
   .facts > div:last-child {
@@ -282,17 +333,74 @@
     color: var(--color-mute);
     font-size: 0.8125rem;
     letter-spacing: 0.14em;
-    line-height: 2.3;
+    line-height: 2.45;
   }
   .facts dd {
     color: var(--color-paper);
     line-height: 2;
   }
+  /* 幅 360px に満たない端末では、項目名の列を取ると内容が 7〜12 字で折り返す。項目名を上に重ねる */
+  @media (max-width: 359px) {
+    .facts > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.1rem;
+    }
+    .facts dt {
+      line-height: 1.9;
+    }
+  }
   @media (min-width: 768px) {
     .facts > div {
-      grid-template-columns: 9em minmax(0, 1fr);
+      grid-template-columns: 8em minmax(0, 1fr);
       gap: 2rem;
-      padding-block: 1.4rem;
+      padding-block: 1.35rem;
+    }
+    .facts dt {
+      font-size: 0.875rem;
+      line-height: 2.4;
+    }
+  }
+
+  /* 順に進むもの（当日の流れ・出てくる順番）。番号は真鍮の小さな数字だけ */
+  .steps {
+    counter-reset: step;
+  }
+  .steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 2.75rem 3.25rem;
+  }
+  .steps > li:last-child {
+    padding-bottom: 0;
+  }
+  .steps > li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0.42em;
+    font-family: var(--font-latin);
+    font-weight: 500;
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    color: var(--color-brass);
+  }
+  .steps > li::after {
+    content: "";
+    position: absolute;
+    left: 0.55rem;
+    top: 2.1em;
+    bottom: 0.75rem;
+    width: 1px;
+    background: var(--color-line);
+  }
+  .steps > li:last-child::after {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .steps > li {
+      padding-left: 4.5rem;
+      padding-bottom: 3.5rem;
     }
   }
 
@@ -323,9 +431,9 @@
     align-items: center;
     min-height: 2.75rem;
     font-size: 0.8125rem;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
     color: var(--color-paper);
-    opacity: 0.86;
+    opacity: 0.84;
     transition: opacity 0.4s var(--ease-quiet);
   }
   .nav-link:hover,
@@ -337,6 +445,23 @@
     text-decoration-thickness: 1px;
     text-underline-offset: 0.7em;
     text-decoration-color: var(--color-brass);
+  }
+  /* ヘッダーの「ご予約」。箱にせず、真鍮の細い下線だけ */
+  .nav-reserve {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.22em;
+    color: var(--color-paper);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.7em;
+    text-decoration-color: rgb(168 145 105 / 0.8);
+    transition: text-decoration-color 0.4s var(--ease-quiet);
+  }
+  .nav-reserve:hover {
+    text-decoration-color: var(--color-paper);
   }
 
   /* ---- 全画面メニュー ---------------------------------------------------- */
@@ -353,15 +478,7 @@
     background: var(--color-ink);
   }
   .menu-dialog[open] {
-    animation: menu-in 0.5s var(--ease-quiet);
-  }
-  @keyframes menu-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    animation: fade-in 0.5s var(--ease-quiet);
   }
 
   /* ---- ヒーロー ---------------------------------------------------------- */
@@ -385,30 +502,75 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* ごくわずかに引いていく（一度きり）。写真は最初から見えているので、表示の速さには影響しない */
+    transform-origin: 50% 58%;
+    animation: hero-settle 9s var(--ease-quiet) both;
   }
-  /* 文字を読めるようにするための陰。飾りではない */
+  @keyframes hero-settle {
+    from {
+      transform: scale(1.05);
+    }
+    to {
+      transform: none;
+    }
+  }
+  /* 文字を読めるようにするための陰。周りを少し落として、奥の灯りに目が行くようにする */
   .hero-shade {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(to bottom, rgb(10 10 10 / 0.5) 0%, rgb(10 10 10 / 0.08) 26%, rgb(10 10 10 / 0.1) 55%, rgb(10 10 10 / 0.82) 100%),
-      linear-gradient(to left, rgb(10 10 10 / 0.42) 0%, rgb(10 10 10 / 0) 46%);
+      linear-gradient(to bottom, rgb(10 10 10 / 0.56) 0%, rgb(10 10 10 / 0.06) 24%, rgb(10 10 10 / 0.04) 52%, rgb(10 10 10 / 0.88) 100%),
+      linear-gradient(to left, rgb(10 10 10 / 0.5) 0%, rgb(10 10 10 / 0) 42%),
+      linear-gradient(to right, rgb(10 10 10 / 0.34) 0%, rgb(10 10 10 / 0) 34%);
     pointer-events: none;
+  }
+  /* 横向きのスマートフォンなど、背の低い画面でも、写真・ことば・ロゴを1画面に収める */
+  @media (max-height: 540px) and (orientation: landscape) {
+    .hero {
+      min-height: 20rem;
+    }
   }
   .hero-copy {
     color: var(--color-paper);
-    font-size: clamp(1.25rem, 1rem + 1.1vw, 2rem);
+    /*
+      縦書きなので、文字の大きさは画面の高さにも合わせる（4.4svh）。
+      背の低い画面で、上のメニューや下の端にことばが掛からないようにするため。
+    */
+    font-size: clamp(1.3125rem, 1.04rem + 1.2vw, 2.125rem); /* svh を知らない古いブラウザ用 */
+    font-size: min(clamp(1.3125rem, 1.04rem + 1.2vw, 2.125rem), 4.4svh);
     line-height: 2.5;
     letter-spacing: 0.36em;
     white-space: nowrap;
     /* 明るい壁の上でも読めるように、暗い影をごく薄く敷く（光らせるためではない） */
     text-shadow: 0 0 1.5em rgb(10 10 10 / 0.6);
   }
+  /* ロゴの下に添える、店の所在。看板の添え書きのように小さく */
+  .hero-sign {
+    display: flex;
+    align-items: center;
+    gap: 1.1em;
+    color: var(--color-paper);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    letter-spacing: 0.42em;
+  }
+  .hero-sign::before {
+    content: "";
+    display: block;
+    width: 2.25rem;
+    height: 1px;
+    background: var(--color-brass);
+  }
+  @media (min-width: 768px) {
+    .hero-sign {
+      font-size: 0.875rem;
+    }
+  }
 
-  /* 下層ページの冒頭 */
+  /* 下層ページの冒頭（固定のヘッダーの分を含む） */
   .page-head {
-    padding-top: clamp(9rem, 20vw, 14rem);
-    padding-bottom: clamp(3.5rem, 8vw, 6rem);
+    padding-top: clamp(8.5rem, 17vw, 13rem);
+    padding-bottom: clamp(3rem, 7vw, 5.5rem);
   }
 
   /* ---- 写真 -------------------------------------------------------------- */
@@ -429,19 +591,51 @@
     height: 100%;
     object-fit: cover;
   }
+  /*
+    写真が画面より高くならないようにする（縦位置の写真は、画面に収まる高さで上下を切り抜く）。
+    幅を画面の割合で決めているので、何もしないと横に広い画面ほど写真が縦に伸び、1画面に収まらなくなる。
+    タブレットの縦向き（文章と縦に積む幅）では、写真のあとの見出しまで1画面に入るよう、少し低くする。
+  */
+  .frame-fit {
+    max-height: 90svh;
+  }
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .frame-fit {
+      max-height: max(68svh, 22rem);
+    }
+  }
 
   /* ---- 読みもの（記事の本文） -------------------------------------------- */
-  .prose > * + * {
+  /*
+    本文は、h2 ごとに <section> にまとまっている（components/sections/ArticleBody.tsx）。
+    節のあいだは 4em。最初の表示のあいだだけ、画面の外の節を後回しにする（上の html[data-cv] の説明を参照）。
+  */
+  .prose > * + *,
+  .prose > section > * + * {
     margin-top: 1.9em;
   }
+  html[data-cv] .prose > section:not([data-cv-done]) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 28rem;
+  }
+  .prose > * + section {
+    margin-top: 4em;
+  }
   .prose h2 {
-    margin-top: 3.6em;
-    padding-top: 2.4em;
-    border-top: 1px solid var(--color-line);
-    font-size: clamp(1.2rem, 1.08rem + 0.6vw, 1.5rem);
+    font-size: clamp(1.25rem, 1.14rem + 0.5vw, 1.5rem);
     line-height: 1.9;
     letter-spacing: 0.12em;
-    scroll-margin-top: 6rem;
+    /* 目次から飛んだとき、ヘッダーの下に少しだけ間を空ける（ヘッダーの分は html の scroll-padding-top が持つ） */
+    scroll-margin-top: 1rem;
+  }
+  /* 節の区切り。罫ではなく、短い真鍮の線を1本 */
+  .prose h2::before {
+    content: "";
+    display: block;
+    width: 2.25rem;
+    height: 1px;
+    margin-bottom: 1.9em;
+    background: var(--color-brass);
   }
   .prose h3 {
     margin-top: 2.8em;
@@ -450,9 +644,14 @@
     letter-spacing: 0.1em;
     color: var(--color-paper);
   }
+  @media (min-width: 768px) {
+    .prose h3 {
+      font-size: 1.125rem;
+    }
+  }
   .prose h2 + *,
   .prose h3 + * {
-    margin-top: 1.3em;
+    margin-top: 1.4em;
   }
   .prose a {
     color: var(--color-paper);
@@ -485,7 +684,7 @@
     content: "";
     position: absolute;
     left: 0.15em;
-    top: 1.02em;
+    top: 0.98em;
     width: 0.6em;
     height: 1px;
     background: var(--color-brass);
@@ -530,47 +729,50 @@
     margin-block: 3.2em;
   }
 
-  /* ---- 現れかた（JS が動いているときだけ） -------------------------------- */
+  /* ---- 現れかた ---------------------------------------------------------- */
+  /*
+    動きは3つだけ。
+      1) 画面に入った写真と文字が、その場でゆっくり濃くなる（位置は動かさない）
+      2) 最初の画面の文字が、一度だけゆっくり現れる
+      3) ヒーローの写真が、ごくわずかに引いていく
+    浮き上がる・追いかける・1文字ずつ出る、といった動きは使わない。
+  */
   .js [data-reveal] {
     opacity: 0;
-    transform: translate3d(0, 18px, 0);
-    transition: opacity 1.1s var(--ease-quiet), transform 1.1s var(--ease-quiet);
+    transition: opacity 1.5s var(--ease-quiet);
     transition-delay: var(--reveal-delay, 0s);
   }
   .js [data-reveal].is-in {
     opacity: 1;
-    transform: none;
   }
 
-  /* 最初の画面の文字は、ゆっくり一度だけ現れる */
-  .rise {
-    animation: rise 1.6s var(--ease-quiet) both;
-    animation-delay: var(--rise-delay, 0.2s);
+  .fade-in {
+    animation: fade-in 1.8s var(--ease-quiet) both;
+    animation-delay: var(--fade-delay, 0.2s);
   }
-  @keyframes rise {
+  @keyframes fade-in {
     from {
       opacity: 0;
-      transform: translate3d(0, 12px, 0);
     }
     to {
       opacity: 1;
-      transform: none;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .js [data-reveal] {
       opacity: 1;
-      transform: none;
       transition: none;
     }
-    .rise,
-    .menu-dialog[open] {
+    .fade-in,
+    .menu-dialog[open],
+    .hero-media img {
       animation: none;
     }
     .more::after,
     .action,
     .link,
+    .nav-reserve,
     .site-header,
     .site-header .hide-on-hero {
       transition: none;

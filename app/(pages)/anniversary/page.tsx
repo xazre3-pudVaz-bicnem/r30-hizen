@@ -1,24 +1,24 @@
 /**
  * 記念日
  * 担当する検索語: すすきの 寿司 記念日（＋ 記念日 ディナー／誕生日／結婚記念日）
- * 役割: 記念日のディナーに寿司店を探す人へ、雰囲気・所要時間・予約の勘どころを伝える。
- * 書かないこと: 付き合う前後のデートの話は /date、会社の会食は /business-dinner。
+ * 役割: 記念日のディナーに寿司店を探す人へ。このページで答えるのは4つ。
+ *       二人での過ごし方 ／ コースと滞在時間 ／ 乾杯のお酒 ／ ご予約で確かめること。
+ * 書かないこと: 付き合う前後のデートの話（距離感・服装・二軒目）は /date、会社の会食は /business-dinner。
  *              ケーキ・花束・メッセージプレート・サプライズ演出・個室・夜景は、用意があると確認できていない。
  *              「できる」とは書かない（質問には「ご案内していない。電話で相談を」と答える）。
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Body, Items, PhotoSplit, Section, Split } from "@/components/sections/Blocks";
+import { Body, Column, Items, PhotoEdge, Section, Split } from "@/components/sections/Blocks";
+import { CourseRows } from "@/components/sections/CourseRows";
 import { FaqList } from "@/components/sections/FaqList";
+import { Onward } from "@/components/sections/Onward";
 import { PageHead } from "@/components/sections/PageHead";
-import { PillarPosts } from "@/components/sections/PillarPosts";
-import { RelatedPages } from "@/components/sections/RelatedPages";
 import { ReservationBlock } from "@/components/sections/ReservationBlock";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { courseById, priceLabel, signatureDish } from "@/data/courses";
 import { pages } from "@/data/pages";
 import { photos } from "@/data/photos";
-import { agePolicy, fragrancePolicy, hoursLine, site, stationWalk } from "@/data/site";
+import { agePolicy, courseById, firstSentence, fragrancePolicy, restaurant, signatureDish } from "@/data/restaurant";
 import { crumbsFor, pageGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
@@ -30,7 +30,7 @@ export const metadata: Metadata = pageMetadata(page);
 export default function AnniversaryPage() {
   const full = courseById("omakase-15");
   const short = courseById("omakase-short");
-  const { web, sameDayDeadline } = site.reservation;
+  const { web, sameDayDeadline } = restaurant.reservation;
 
   const questions = [
     {
@@ -39,7 +39,7 @@ export default function AnniversaryPage() {
     },
     {
       q: "個室はありますか？",
-      a: `個室はございません。お席は${site.seating.style}です。${agePolicy.audience}のため、まわりのお席も大人のお客様だけです。`,
+      a: `個室はございません。お席は${restaurant.seats.style}です。${agePolicy.audience}のため、まわりのお席も大人のお客様だけです。`,
     },
     {
       q: "服装の決まりはありますか？",
@@ -65,84 +65,76 @@ export default function AnniversaryPage() {
           </>
         }
         lead="結婚記念日、誕生日、節目の日。同じ料理を、同じ速さで、並んで味わう。それだけで、いつもの食事とは違う夜になります。"
-        photo={photos.cuisine03}
-        photoPosition="50% 52%"
+        photo={photos.cuisine06}
+        photoPosition="46% 54%"
       />
 
       <Section>
-        <Split heading="記念日に、おまかせが向く理由。">
+        <Column
+          side="left"
+          heading={
+            <>
+              <span className="ib">二人で、同じものを、</span>
+              <span className="ib">同じ速さで。</span>
+            </>
+          }
+        >
           <Body>
             <p>品書きがないので、何を頼むかに気を取られません。次の一皿を二人で待つ、その時間ごと記念日になります。</p>
-            <p>{courseById("omakase-15").contents.slice(0, 2).join("、")}。少しずつ、たくさんの種類を味わえるのも、おまかせの良さです。旬の魚介と季節の一皿が、その日だけの組み合わせで並びます。</p>
-            <p>{site.name}は{agePolicy.audience}。静かな店内で、ゆっくりと言葉を交わしていただけます。</p>
+            <p>席は、横に並ぶカウンター。向かい合うより近く、目の前の仕事を一緒に眺めていられます。</p>
+            <p>
+              {restaurant.name}は{agePolicy.audience}。まわりのお席も、大人のお客様だけです。静かな店内で、ゆっくりと言葉を交わしていただけます。
+            </p>
           </Body>
-        </Split>
+        </Column>
       </Section>
 
-      <Section tone="ink-2">
-        <PhotoSplit photo={photos.sushi04} ratio="3/2">
+      <Section bare>
+        <PhotoEdge photo={photos.cuisine03} side="left" width="half" ratio="4/5" ratioSp="1/1" position="52% 50%" align="end">
           <h2 className="t-h2">
-            <span className="ib">記念日に合う、</span>
-            <span className="ib">二つのコース。</span>
+            <span className="ib">記念日の、</span>
+            <span className="ib">コースと滞在時間。</span>
           </h2>
-          <div className="mt-8">
-            <Items
-              items={[
-                {
-                  key: full.id,
-                  title: full.name,
-                  body: (
-                    <p>
-                      {full.items}・{priceLabel(full.price)}。{full.notes[0]}時間を気にせず過ごしたい記念日に。
-                    </p>
-                  ),
-                },
-                {
-                  key: short.id,
-                  title: short.name,
-                  body: (
-                    <p>
-                      {short.items}・{priceLabel(short.price)}。ご滞在は{short.stay}まで。このあとにもう一軒、という夜に。
-                    </p>
-                  ),
-                },
-              ]}
+          <div className="mt-9">
+            <CourseRows
+              only={[full.id, short.id]}
+              practical
+              notes={{
+                [full.id]: `${firstSentence(full.notes[0])}時間を気にせず過ごしたい記念日に。`,
+                [short.id]: "このあとにもう一軒、という夜に。旬の要所を、ほどよく。",
+              }}
             />
           </div>
-          <p className="mt-6 text-[0.9375rem] leading-[2.05]">どちらも、結びは{signatureDish.label}です。</p>
-          <p className="mt-8">
+          <p className="mt-7">どちらも、結びは{signatureDish.label}です。</p>
+          <p className="mt-9">
             <Link href={pages.omakase.path} className="more">
               コースの内容を見る
             </Link>
           </p>
-        </PhotoSplit>
+        </PhotoEdge>
       </Section>
 
       <Section>
         <Split heading="乾杯のお酒">
           <Body>
-            <p>{site.drinks.bottles}日本酒で始めるのも、泡で始めるのも、お好みで。</p>
+            <p>{restaurant.drinks.bottles}日本酒で始めるのも、泡で始めるのも、お好みで。</p>
           </Body>
-          <p className="mt-8">
+          <p className="mt-9">
             <Link href={pages.drink.path} className="more">
-              お酒について
+              鮨に合わせるお酒
             </Link>
           </p>
         </Split>
       </Section>
 
-      <Section tone="ink-2">
-        <Split heading="記念日のご予約で、確かめておきたいこと。">
+      <Section>
+        <Split heading="ご予約のときに、確かめておきたいこと。">
           <Items
             items={[
               {
                 key: "book",
                 title: "ご予約の方法",
-                body: (
-                  <p>
-                    {web.partySize}名様でしたら、Web予約をご利用いただけます。お電話でも承ります。
-                  </p>
-                ),
+                body: <p>{web.partyLabel}でしたら、Web予約をご利用いただけます。お電話でも承ります。</p>,
               },
               {
                 key: "allergy",
@@ -155,13 +147,9 @@ export default function AnniversaryPage() {
                 body: <p>{fragrancePolicy.sentence}贈りものの香水は、お食事のあとに。</p>,
               },
               {
-                key: "time",
-                title: "お時間",
-                body: (
-                  <p>
-                    営業は{hoursLine}。{stationWalk}です。
-                  </p>
-                ),
+                key: "age",
+                title: agePolicy.label,
+                body: <p>お二人とも{agePolicy.minAge}歳以上であることをご確認ください。</p>,
               },
             ]}
           />
@@ -174,16 +162,8 @@ export default function AnniversaryPage() {
         </Split>
       </Section>
 
-      <PillarPosts path={page.path} limit={4} />
-      <RelatedPages
-        items={[
-          { page: "omakase", note: "コースの品数・料金・所要時間。" },
-          { page: "space", note: "黒を基調にした、カウンター席だけの店内。" },
-          { page: "access", note: `${stationWalk}。地図と店舗情報。` },
-          { page: "reservation", note: "ご予約の方法と、ご来店前のお願い。" },
-        ]}
-      />
-      <ReservationBlock lead="記念日のお席は、お早めにどうぞ。2名様のご予約は、Web予約でも承ります。" />
+      <Onward pillar={page.path} items={["omakase", "space", "date"]} />
+      <ReservationBlock lead={`記念日のお席は、お早めにどうぞ。${web.partyLabel}のご予約は、Web予約でも承ります。`} />
     </>
   );
 }

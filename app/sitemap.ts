@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { journalCategories, MIN_POSTS_TO_INDEX } from "@/data/journal-categories";
 import { pageList } from "@/data/pages";
-import { CONFIRMED_AT } from "@/data/site";
+import { CONFIRMED_AT } from "@/data/restaurant";
 import { getAllPosts } from "@/lib/journal";
 import { absoluteUrl, isIndexable } from "@/lib/seo";
 

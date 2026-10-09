@@ -1,12 +1,10 @@
 /** 文章の比較に使う小さな道具 */
+import { keywordKey, normalizeTerm } from "../../../lib/keywords";
 
-/** 記号・空白を落として比べやすくする */
-export function normalize(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/[\s　、。，．・｜|「」『』（）()［］\[\]！？!?：:；;〜~\-―—–]/g, "")
-    .replace(/鮨|すし|鮓/g, "寿司");
-}
+export { keywordKey };
+
+/** 記号・空白を落として比べやすくする（lib/keywords.ts と同じもの） */
+export const normalize = normalizeTerm;
 
 function bigrams(s: string): Map<string, number> {
   const m = new Map<string, number>();
@@ -51,16 +49,6 @@ export function shingleOverlap(a: string, b: string, k = 8): number {
   let hit = 0;
   for (const g of x) if (y.has(g)) hit++;
   return hit / Math.min(x.size, y.size);
-}
-
-/** 検索語を比べるための正規化（語の順番を無視し、寿司／鮨の表記ゆれを吸収する） */
-export function keywordKey(keyword: string): string {
-  return keyword
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((w) => normalize(w))
-    .sort()
-    .join(" ");
 }
 
 /** 文に分ける（。！？と改行で区切る） */

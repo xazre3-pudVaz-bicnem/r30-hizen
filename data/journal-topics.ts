@@ -3,18 +3,28 @@
  *
  * ・1題材＝1記事＝1つの検索語（primaryKeyword）。同じ語を二度狙わない。
  * ・固定ページ（data/pages.ts）の primaryKeyword と同じ語は、ここに置かない（npm run seo:audit が確かめる）。
- * ・angle は「何を書くか／書かないか」。店について書けるのは事実シート（data/site.ts・data/courses.ts）の範囲だけ。
+ * ・angle は「何を書くか／書かないか」。店について書けるのは事実シート（data/restaurant.ts）と、
+ *   店からのメモ（data/shop-notes.ts）の範囲だけ。
+ * ・tier は書く優先度。A＝この店にしか書けない話（店の仕事・コース・名物・決まり）、
+ *   B＝すすきのでの場面（記念日・デート・接待・旅行・おまかせ・カウンター）、C＝鮨と酒の一般知識。
+ *   分類で決まり（下の TIER_BY_CATEGORY）、店の事実を軸に書ける題材だけ個別に A へ上げている（TIER_A）。
+ *   自動投稿は、最近の記事の割合が A 45%・B 40%・C 15% に近づくように選ぶ（scripts/journal/lib/select.ts）。
  * ・months を持つ題材は、その月にだけ選ばれる（旬の話を季節外れに出さないため）。
  * ・使い終わった題材は、記事の frontmatter（topicId）で判定する。ここから消さなくてよい。
  * ・題材が尽きたら、自動投稿はモデルに新しい題材を1つ提案させ、同じ基準で検査してから書く
  *   （scripts/journal/generate.ts）。足したい題材があれば、ここへ追記するのがいちばん確実。
  */
 import type { PageKey } from "./pages";
+import { agePolicy } from "./restaurant";
+
+export type Tier = "A" | "B" | "C";
 
 export type Topic = {
   /** 記事の slug になる。半角英小文字・数字・ハイフン */
   id: string;
   category: string;
+  /** 書く優先度（A＝店にしか書けない話／B＝すすきのでの場面／C＝一般知識） */
+  tier: Tier;
   primaryKeyword: string;
   secondaryKeywords: string[];
   angle: string;
@@ -24,6 +34,40 @@ export type Topic = {
   months?: number[];
 };
 
+/** 分類ごとの優先度 */
+export const TIER_BY_CATEGORY: Record<string, Tier> = {
+  hizen: "A",
+  "susukino-sushi": "B",
+  anniversary: "B",
+  date: "B",
+  business: "B",
+  omakase: "B",
+  sapporo: "B",
+  knowledge: "C",
+  season: "C",
+  "sake-wine": "C",
+};
+
+/**
+ * 分類は一般知識・場面だが、店の事実（握りの仕事・コースの内容・名物の丼）を軸に書ける題材。
+ * 店が実際にしている仕事と、実際に出している一皿の話なので、A として先に書く。
+ */
+const TIER_A = new Set([
+  "nitsume-toha", // 煮ツメ（店の握りの仕事）
+  "kakushibocho-toha", // 隠し包丁（同）
+  "ginshari-toha", // 銀シャリ
+  "shuko-toha", // 酒肴（コースの内容）
+  "hassun-toha", // 八寸（同）
+  "omakase-shime", // コースの結び（名物の丼）
+  "uni-shun-hokkaido", // 雲丹（名物の丼の具）
+  "ikura-shun", // いくら（同）
+  "kegani-shun", // 毛蟹（同）
+]);
+
+export function tierOf(id: string, category: string): Tier {
+  return TIER_A.has(id) ? "A" : (TIER_BY_CATEGORY[category] ?? "C");
+}
+
 const t = (
   id: string,
   category: string,
@@ -32,7 +76,7 @@ const t = (
   secondaryKeywords: string[],
   angle: string,
   months?: number[],
-): Topic => ({ id, category, pillar, primaryKeyword, secondaryKeywords, angle, months });
+): Topic => ({ id, category, tier: tierOf(id, category), pillar, primaryKeyword, secondaryKeywords, angle, months });
 
 export const topics: Topic[] = [
   // ---- すすきの × 寿司 ------------------------------------------------------
@@ -49,7 +93,7 @@ export const topics: Topic[] = [
 
   // ---- 記念日 × 寿司 --------------------------------------------------------
   t("tanjobi-sushi-dinner", "anniversary", "anniversary", "誕生日 寿司 ディナー", ["誕生日 ディナー 札幌 大人", "誕生日 鮨 おまかせ"], "大人の誕生日を鮨で祝う。演出に頼らず、席と料理そのものを贈りものにする考え方。ケーキ等の用意があるとは書かない"),
-  t("kanreki-iwai-sushi", "anniversary", "anniversary", "還暦祝い 寿司", ["還暦 食事 札幌", "還暦祝い 少人数 食事"], "還暦を少人数で祝う席。30歳未満は入店できないため、孫や若い家族が同席する会には向かないことも正直に書く"),
+  t("kanreki-iwai-sushi", "anniversary", "anniversary", "還暦祝い 寿司", ["還暦 食事 札幌", "還暦祝い 少人数 食事"], `還暦を少人数で祝う席。${agePolicy.label}のため、孫や若い家族が同席する会には向かないことも正直に書く`),
   t("shoshin-iwai-sushi", "anniversary", "anniversary", "昇進祝い 食事 寿司", ["昇進祝い ディナー", "お祝い 食事 二人"], "昇進や節目を、家族や親しい人と鮨で祝う夜"),
   t("taishoku-iwai-sushi", "anniversary", "anniversary", "退職祝い 食事 寿司", ["定年 お祝い 食事", "退職祝い 夫婦"], "長く勤めた人をねぎらう食事に鮨を。少人数で落ち着いて過ごす席として"),
   t("kinenbi-yoyaku-itsu", "anniversary", "reservation", "記念日 ディナー 予約 いつ", ["記念日 予約 何日前", "記念日 レストラン 予約 タイミング"], "記念日の予約をいつ入れるか。日にちが動かせない予約の考え方と、予約時に伝えること"),
@@ -156,7 +200,7 @@ export const topics: Topic[] = [
   t("shime-parfait-sushi", "sapporo", "access", "締めパフェ 鮨のあと", ["札幌 締めパフェ とは", "すすきの 食後 過ごし方"], "鮨のあとに締めパフェ、という札幌らしい夜の流れ。特定の店名は挙げない"),
 
   // ---- R-30 hizenについて ---------------------------------------------------
-  t("r30-hizen-nenrei", "hizen", "concept", "R-30 hizen 年齢制限", ["R-30 hizen 30歳未満", "30歳未満 入店不可 寿司"], "年齢のきまりについて。公式に示している理由だけを書き、推測で理由を足さない"),
+  t("r30-hizen-nenrei", "hizen", "concept", "R-30 hizen 年齢制限", [`R-30 hizen ${agePolicy.minAge}歳未満`, "R-30 hizen 年齢 入店"], "年齢のきまりについて。公式に示している理由だけを書き、推測で理由を足さない"),
   t("r30-hizen-kaori", "hizen", "concept", "R-30 hizen 香水", ["R-30 hizen 柔軟剤", "寿司屋 香水 お断り"], "香りのお願いについて。鮨と香りの関係から説明する"),
   t("r30-hizen-sanshokudon", "hizen", "cuisine", "R-30 hizen 三食丼", ["雲丹 いくら 毛蟹 丼", "R-30 hizen 名物"], "結びの一品について。雲丹・いくら・毛蟹という三つの素材の取り合わせを、味の重なりから書く"),
   t("r30-hizen-toujitsu", "hizen", "reservation", "R-30 hizen 当日", ["R-30 hizen 当日予約 何時まで", "R-30 hizen 電話"], "当日のご予約について。締め切りの時刻、電話のかけ方、伝えること"),

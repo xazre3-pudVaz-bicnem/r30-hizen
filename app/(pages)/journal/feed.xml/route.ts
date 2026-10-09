@@ -1,5 +1,5 @@
 import { pages } from "@/data/pages";
-import { site } from "@/data/site";
+import { restaurant } from "@/data/restaurant";
 import { getAllPosts } from "@/lib/journal";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -31,7 +31,7 @@ export function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>${esc(`${pages.journal.label}｜${site.name}`)}</title>
+    <title>${esc(`${pages.journal.label}｜${restaurant.name}`)}</title>
     <link>${home}</link>
     <description>${esc(pages.journal.description)}</description>
     <language>ja</language>

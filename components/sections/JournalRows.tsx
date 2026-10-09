@@ -21,19 +21,19 @@ export function JournalRows({ posts, headingLevel: H = "h3", withSummary = false
           <li key={post.slug}>
             <Link
               href={`/journal/${post.slug}`}
-              className="group grid gap-x-10 gap-y-2 py-7 md:grid-cols-[11rem_minmax(0,1fr)] md:py-9"
+              className="group grid gap-x-10 gap-y-2.5 py-8 md:grid-cols-[10.5rem_minmax(0,1fr)] md:py-10"
             >
               <p className="t-note flex items-baseline gap-x-4 md:flex-col md:gap-y-1">
                 <time dateTime={post.date} className="num text-[0.9375rem] tracking-[0.12em]">
                   {formatDate(post.date)}
-                </time>
+                </time>{" "}
                 {category && <span>{category.name}</span>}
               </p>
               <div>
                 <H className="text-[1.0625rem] leading-[1.9] tracking-[0.1em] text-paper transition-colors duration-300 group-hover:text-brass md:text-[1.1875rem]">
                   <Phrase>{post.title}</Phrase>
                 </H>
-                {withSummary && <p className="mt-3 text-[0.875rem] leading-[2] text-paper-2">{post.summary}</p>}
+                {withSummary && <p className="mt-3 max-w-[40em] text-[0.9375rem] leading-[2] text-paper-2">{post.summary}</p>}
               </div>
             </Link>
           </li>

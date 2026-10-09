@@ -37,7 +37,14 @@ export type PostMeta = {
   topicId?: string;
   /** 書き方の型（自動投稿が毎回ちがう構成にするための記録） */
   format?: string;
-  /** editor＝人が書いた／auto＝自動投稿 */
+  /** 書く優先度（A＝店にしか書けない話／B＝すすきのでの場面／C＝一般知識）。data/journal-topics.ts を参照 */
+  tier?: "A" | "B" | "C";
+  /** この記事が答えている問いを一文で（題材が近すぎる記事を作らないための比較に使う） */
+  semanticTopic?: string;
+  /**
+   * 書かれ方の記録。editor＝人が書いた／auto＝自動投稿。
+   * 画面に出す書き手の名前（店名）とは別のもの（data/restaurant.ts の author）。
+   */
   author: "editor" | "auto";
   /** 同じ日の記事の並び順（大きいほど上） */
   order: number;
@@ -140,6 +147,8 @@ export function parsePost(file: string): { post?: Post; error?: string } {
     photo: photo!,
     topicId: str(d.topicId),
     format: str(d.format),
+    tier: d.tier === "A" || d.tier === "B" || d.tier === "C" ? d.tier : undefined,
+    semanticTopic: str(d.semanticTopic),
     author: d.author === "auto" ? "auto" : "editor",
     order: typeof d.order === "number" ? d.order : 0,
     body,

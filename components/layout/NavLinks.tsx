@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 export function NavLinks({ items }: { items: { href: string; label: string }[] }) {
   const pathname = usePathname();
   return (
-    <ul className="flex items-center gap-x-7 xl:gap-x-9">
+    <ul className="flex items-center gap-x-8 xl:gap-x-10">
       {items.map((item) => {
         const current = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (

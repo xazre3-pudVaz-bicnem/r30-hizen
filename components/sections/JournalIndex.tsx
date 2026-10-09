@@ -24,67 +24,57 @@ export function JournalIndex({ posts, currentCategory, pagination }: Props) {
   const categories = getActiveCategories();
 
   return (
-    <div className="bg-ink">
-      <div className="wrap section-tight">
-        <nav aria-label="分類" className="border-y border-line py-5">
-          <ul className="flex flex-wrap gap-x-8 gap-y-1">
-            <li>
+    <div className="wrap pb-[calc(var(--gap)/2)]">
+      <nav aria-label="分類" className="border-y border-line py-4">
+        <ul className="flex flex-wrap gap-x-8 gap-y-0">
+          <li>
+            <Link href={pages.journal.path} aria-current={!currentCategory ? "page" : undefined} className="nav-link">
+              すべて
+            </Link>
+          </li>
+          {categories.map((c) => (
+            <li key={c.slug}>
               <Link
-                href={pages.journal.path}
-                aria-current={!currentCategory ? "page" : undefined}
+                href={`/journal/category/${c.slug}`}
+                aria-current={currentCategory === c.slug ? "page" : undefined}
                 className="nav-link"
               >
-                すべて
+                {c.name}
               </Link>
             </li>
-            {categories.map((c) => (
-              <li key={c.slug}>
-                <Link
-                  href={`/journal/category/${c.slug}`}
-                  aria-current={currentCategory === c.slug ? "page" : undefined}
-                  className="nav-link"
-                >
-                  {c.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+          ))}
+        </ul>
+      </nav>
 
-        <div className="mt-6">
-          {posts.length > 0 ? (
-            <JournalRows posts={posts} headingLevel="h2" withSummary />
-          ) : (
-            <p className="py-16">ただいま準備中です。</p>
-          )}
-        </div>
-
-        {pagination && pagination.total > 1 && (
-          <nav aria-label="ページ送り" className="mt-12 flex items-center justify-between gap-6">
-            {pagination.current > 1 ? (
-              <Link
-                href={pagination.current === 2 ? pages.journal.path : `/journal/page/${pagination.current - 1}`}
-                className="more"
-                rel="prev"
-              >
-                新しい便り
-              </Link>
-            ) : (
-              <span />
-            )}
-            <p className="t-note">
-              <span className="num">{pagination.current}</span> ／ <span className="num">{pagination.total}</span>
-            </p>
-            {pagination.current < pagination.total ? (
-              <Link href={`/journal/page/${pagination.current + 1}`} className="more" rel="next">
-                以前の便り
-              </Link>
-            ) : (
-              <span />
-            )}
-          </nav>
-        )}
+      <div className="mt-2">
+        {posts.length > 0 ? <JournalRows posts={posts} headingLevel="h2" withSummary /> : <p className="py-16">ただいま準備中です。</p>}
       </div>
+
+      {pagination && pagination.total > 1 && (
+        <nav aria-label="ページ送り" className="mt-12 flex items-center justify-between gap-6">
+          {pagination.current > 1 ? (
+            <Link
+              href={pagination.current === 2 ? pages.journal.path : `/journal/page/${pagination.current - 1}`}
+              className="more"
+              rel="prev"
+            >
+              新しい便り
+            </Link>
+          ) : (
+            <span />
+          )}
+          <p className="t-note">
+            <span className="num">{pagination.current}</span> ／ <span className="num">{pagination.total}</span>
+          </p>
+          {pagination.current < pagination.total ? (
+            <Link href={`/journal/page/${pagination.current + 1}`} className="more" rel="next">
+              以前の便り
+            </Link>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )}
     </div>
   );
 }

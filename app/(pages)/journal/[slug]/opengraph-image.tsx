@@ -11,12 +11,12 @@ import { ImageResponse } from "next/og";
 import { splitPhrases } from "@/components/ui/Phrase";
 import { categoryBySlug } from "@/data/journal-categories";
 import { pages } from "@/data/pages";
-import { site } from "@/data/site";
+import { restaurant } from "@/data/restaurant";
 import { getAllPosts, getPost } from "@/lib/journal";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = `${site.name}｜${pages.journal.label}`;
+export const alt = `${restaurant.name}｜${pages.journal.label}`;
 
 export function generateStaticParams() {
   return getAllPosts().map((p) => ({ slug: p.slug }));
@@ -116,7 +116,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               // eslint-disable-next-line @next/next/no-img-element -- 画像生成（satori）の中では <img> を使う
               <img src={logo} alt="" width={170} height={72} />
             ) : (
-              <div style={{ display: "flex", fontSize: 34 }}>{site.name}</div>
+              <div style={{ display: "flex", fontSize: 34 }}>{restaurant.name}</div>
             )}
             <div style={{ display: "flex", fontSize: 17, letterSpacing: 6, color: "#a09a90" }}>SUSUKINO / SAPPORO</div>
           </div>

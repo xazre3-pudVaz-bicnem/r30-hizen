@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
-  /** Google ビジネスプロフィールの埋め込み URL（data/site.ts の map.embedUrl） */
+  /** Google ビジネスプロフィールの埋め込み URL（data/restaurant.ts の map.embedUrl） */
   embedUrl: string;
   /** Google マップで開くリンク */
   linkUrl: string;
   title: string;
-  /** 縦に大きく出す（アクセスのページ用） */
+  /** 縦に大きく出す（アクセスのページ用）。PC では画面に残して追従させるので、高さは画面に収まるところまで */
   tall?: boolean;
 };
 
@@ -38,7 +38,7 @@ export function MapEmbed({ embedUrl, linkUrl, title, tall }: Props) {
 
   return (
     <div>
-      <div ref={ref} className={`frame ${tall ? "aspect-[4/5] md:aspect-[4/3] lg:aspect-[5/6]" : "aspect-[4/3] md:aspect-[16/9]"}`}>
+      <div ref={ref} className={`frame ${tall ? "aspect-[4/5] md:aspect-[4/3] lg:aspect-[5/6] lg:max-h-[calc(100svh-15rem)]" : "aspect-[4/3] md:aspect-[16/9]"}`}>
         {show ? (
           <iframe
             src={embedUrl}

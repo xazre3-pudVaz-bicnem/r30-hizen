@@ -17,13 +17,29 @@ export function MenuDialog({ children }: { children: ReactNode }) {
     if (ref.current?.open) ref.current.close();
   }, [pathname]);
 
+  // 開いたまま画面が広がって、ヘッダーにメニューが並ぶ幅になったら閉じる（タブレットを横に向けたときなど）
+  useEffect(() => {
+    const wide = window.matchMedia("(min-width: 1024px)");
+    const close = () => {
+      if (wide.matches && ref.current?.open) ref.current.close();
+    };
+    wide.addEventListener("change", close);
+    return () => wide.removeEventListener("change", close);
+  }, []);
+
   return (
     <>
       <button
         type="button"
         aria-haspopup="dialog"
         aria-controls="site-menu"
-        onClick={() => ref.current?.showModal()}
+        onClick={() => {
+          const dialog = ref.current;
+          if (!dialog) return;
+          // <dialog> に対応していない古いブラウザでは、同じリンクが並ぶフッターへ送る
+          if (typeof dialog.showModal === "function") dialog.showModal();
+          else document.querySelector("footer")?.scrollIntoView();
+        }}
         className="-mr-3 flex size-12 items-center justify-center lg:hidden"
       >
         <span className="sr-only">メニューを開く</span>
@@ -43,7 +59,7 @@ export function MenuDialog({ children }: { children: ReactNode }) {
           if ((e.target as HTMLElement).closest("a")) ref.current?.close();
         }}
       >
-        <div className="wrap flex h-[4.5rem] items-center justify-end">
+        <div className="wrap flex h-16 items-center justify-end">
           <button
             type="button"
             onClick={() => ref.current?.close()}

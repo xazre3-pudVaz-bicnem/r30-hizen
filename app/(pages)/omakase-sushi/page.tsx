@@ -1,21 +1,21 @@
 /**
  * おまかせ寿司とは
  * 担当する検索語: すすきの おまかせ寿司
- * 役割: おまかせという頼み方を体験したい人へ、流れ・所要時間・事前に伝えることを説明する。
+ * 役割: おまかせという頼み方を体験したい人へ。このページで答えるのは4つ。
+ *       おまかせの仕組み ／ 出てくる順番 ／ 3つのコースのちがい ／ 先に伝えておくこと。
  * 書かないこと: 料金の一覧は /omakase に置く（ここでは繰り返さず、リンクで送る）。
+ *              席での作法（出されたらすぐに・手でも箸でも…）は /counter-sushi。
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Body, Items, PhotoSplit, Section, Split } from "@/components/sections/Blocks";
+import { Body, Column, Items, PhotoEdge, Section, Split, Steps } from "@/components/sections/Blocks";
+import { Onward } from "@/components/sections/Onward";
 import { PageHead } from "@/components/sections/PageHead";
-import { PillarPosts } from "@/components/sections/PillarPosts";
-import { RelatedPages } from "@/components/sections/RelatedPages";
 import { ReservationBlock } from "@/components/sections/ReservationBlock";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { courseById, courseCommon, courses, signatureDish } from "@/data/courses";
 import { pages } from "@/data/pages";
 import { photos } from "@/data/photos";
-import { site } from "@/data/site";
+import { courseById, courseCommon, courses, coursesWithSignatureDish, firstSentence, restaurant, signatureDish } from "@/data/restaurant";
 import { crumbsFor, pageGraph } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
@@ -33,52 +33,82 @@ export default function OmakaseSushiPage() {
 
       <PageHead
         crumbs={crumbs}
-        label="鮨を選ぶ"
+        label="はじめての方へ"
         title={
           <>
-            <span className="ib">すすきので、おまかせ寿司を。</span>
-            <span className="ib">品書きのない鮨の楽しみ方。</span>
+            <span className="ib">すすきののおまかせ寿司。</span>
+            <span className="ib">品書きのない鮨の、</span>
+            <span className="ib">すすみ方。</span>
           </>
         }
         lead="選ぶのは、コースだけ。何が出てくるかは、その日の仕入れ次第。おまかせという頼み方を、気負わずに楽しむための手引きです。"
-        photo={photos.cuisine02}
-        photoPosition="50% 50%"
       />
 
-      <Section>
-        <Split heading="おまかせとは、何を任せるのか。">
+      <Section className="pt-0">
+        <Column side="right" heading="おまかせとは、何を任せるのか。">
           <Body>
             <p>任せるのは、三つです。何を出すか、どの順に出すか、どう仕立てるか。</p>
             <p>魚は、日によって状態が違います。同じ魚でも、生で握るのがよい日もあれば、昆布で〆たほうがよい日もある。その判断を、いちばんよく知っている人に委ねるのが、おまかせです。</p>
             <p>お客様が決めるのは、コースと、お酒だけ。あとは席に着いて、出てくるものを待つだけで構いません。</p>
           </Body>
-        </Split>
+        </Column>
       </Section>
 
-      <Section tone="ink-2">
-        <PhotoSplit photo={photos.omakase01} ratio="3/2">
+      <Section bare>
+        <PhotoEdge photo={photos.omakase01} side="left" width="narrow" ratio="3/2" position="50% 50%" align="start">
           <h2 className="t-h2">
-            <span className="ib">{site.name}の、</span>
-            <span className="ib">おまかせの進み方。</span>
+            <span className="ib">出てくる順番。</span>
           </h2>
-          <ol className="rows mt-8">
-            <li className="grid grid-cols-[3.5em_minmax(0,1fr)] gap-x-4 py-6">
-              <span className="text-paper">酒肴</span>
-              <span className="text-[0.9375rem] leading-[2.05]">まずは、季節の一皿から。従来の手法にとらわれない仕立てで、お酒とともに。</span>
-            </li>
-            <li className="grid grid-cols-[3.5em_minmax(0,1fr)] gap-x-4 py-6">
-              <span className="text-paper">握り</span>
-              <span className="text-[0.9375rem] leading-[2.05]">{site.techniques.join("、")}。仕事を施した握りを、一貫ずつ、目の前から。</span>
-            </li>
-            <li className="grid grid-cols-[3.5em_minmax(0,1fr)] gap-x-4 py-6">
-              <span className="text-paper">結び</span>
-              <span className="text-[0.9375rem] leading-[2.05]">最後に、{signatureDish.label}を。</span>
-            </li>
-          </ol>
-          <p className="t-note mt-5">
-            {full.name}・{courseById("omakase-short").name}の流れです。{courseCommon.menuUndisclosed}
+          <div className="mt-10">
+            <Steps
+              items={[
+                {
+                  key: "shuko",
+                  title: "酒肴",
+                  body: <p>まずは、季節の一皿から。従来の手法にとらわれない仕立てで、お酒とともに。</p>,
+                },
+                {
+                  key: "nigiri",
+                  title: "握り",
+                  body: <p>{restaurant.techniques.join("、")}。仕事を施した握りを、一貫ずつ、目の前から。</p>,
+                },
+                {
+                  key: "musubi",
+                  title: "結び",
+                  body: <p>最後に、{signatureDish.label}を。</p>,
+                },
+              ]}
+            />
+          </div>
+          <p className="t-note mt-8">
+            {coursesWithSignatureDish.map((c) => c.name).join("・")}の流れです。{full.name}は、{full.contents.slice(0, 2).join("、")}。{courseCommon.menuUndisclosed}
           </p>
-        </PhotoSplit>
+        </PhotoEdge>
+      </Section>
+
+      <Section>
+        <Split heading={`${courses.length}つのコースの、ちがい。`}>
+          <ul className="rows">
+            {courses.map((c) => (
+              <li key={c.id} className="py-7 md:py-8">
+                <h3 className="text-[1.0625rem] tracking-[0.12em] text-paper md:text-[1.125rem]">{c.name}</h3>
+                <p className="t-note mt-2">
+                  {c.items}
+                  <span className="mx-3" aria-hidden="true">
+                    ／
+                  </span>
+                  {c.contents.join("、")}
+                </p>
+                <p className="mt-2 text-[0.9375rem] leading-[1.95] md:text-[1rem]">{c.suits}。</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-9">
+            <Link href={pages.omakase.path} className="more">
+              料金と所要時間を見る
+            </Link>
+          </p>
+        </Split>
       </Section>
 
       <Section>
@@ -103,76 +133,21 @@ export default function OmakaseSushiPage() {
               {
                 key: "time",
                 title: "お時間",
-                body: <p>{full.notes[0]}このあとのご予定は、少し余裕を見ておくと安心です。</p>,
-              },
-            ]}
-          />
-        </Split>
-      </Section>
-
-      <Section tone="ink-2">
-        <Split heading="おまかせを、気負わず楽しむために。">
-          <Items
-            items={[
-              {
-                key: "soon",
-                title: "握りは、出されたらすぐに",
-                body: <p>握りは、置かれた瞬間がいちばんおいしい。話の途中でも、まず一貫を。</p>,
-              },
-              {
-                key: "hands",
-                title: "手でも、箸でも",
-                body: <p>どちらで召し上がっても構いません。食べやすいほうで。</p>,
-              },
-              {
-                key: "ask",
-                title: "わからないことは、尋ねる",
-                body: <p>いまの魚は何か、どんな仕事がしてあるのか。尋ねることは、失礼ではありません。カウンターの楽しみのひとつです。</p>,
-              },
-              {
-                key: "pace",
-                title: "お酒の進み具合を伝える",
-                body: <p>もう少しゆっくり飲みたい、そろそろ握りに移りたい。ひとこと伝えると、過ごしやすくなります。</p>,
+                body: <p>{full.name}は、{firstSentence(full.notes[0])}このあとのご予定は、少し余裕を見ておくと安心です。</p>,
               },
             ]}
           />
           <p className="mt-10">
-            <Link href={pages.counterSushi.path} className="more">
-              カウンターでの過ごし方
+            席での過ごし方は、
+            <Link href={pages.counterSushi.path} className="link">
+              {pages.counterSushi.label}
             </Link>
+            のページにまとめています。
           </p>
         </Split>
       </Section>
 
-      <Section>
-        <Split heading={`コースは、${courses.length}つ。`}>
-          <ul className="rows">
-            {courses.map((c) => (
-              <li key={c.id} className="grid gap-x-10 gap-y-1 py-6 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:items-baseline">
-                <span className="text-[1.0625rem] tracking-[0.12em] text-paper">{c.name}</span>
-                <span className="text-[0.9375rem] leading-[2]">
-                  {c.items}　{c.contents.join("・")}
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-10">
-            <Link href={pages.omakase.path} className="more">
-              料金と所要時間を見る
-            </Link>
-          </p>
-        </Split>
-      </Section>
-
-      <PillarPosts path={page.path} limit={4} />
-      <RelatedPages
-        items={[
-          { page: "omakase", note: "3つのコースの品数・料金・所要時間。" },
-          { page: "cuisine", note: "握りの仕事と、季節の一皿。" },
-          { page: "counterSushi", note: "カウンターで鮨を味わうということ。" },
-          { page: "reservation", note: "ご予約の方法と、ご来店前のお願い。" },
-        ]}
-      />
+      <Onward pillar={page.path} items={["omakase", "cuisine", "susukinoSushi"]} />
       <ReservationBlock />
     </>
   );

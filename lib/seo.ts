@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { site } from "@/data/site";
+import { restaurant } from "@/data/restaurant";
 import type { PageDef } from "@/data/pages";
 
 /**
@@ -11,10 +11,14 @@ export const SITE_URL: string | undefined = process.env.NEXT_PUBLIC_SITE_URL || 
 /** 検索エンジンに載せてよい状態か */
 export const isIndexable = Boolean(SITE_URL);
 
-/** パスを絶対 URL にする。公開 URL が決まっていなければ undefined */
+/**
+ * パスを絶対 URL にする。公開 URL が決まっていなければ undefined。
+ * トップは、末尾のスラッシュなし（https://www.hizen-susukino.jp）にそろえる。Next.js が canonical と og:url を
+ * この形で出すため、sitemap・構造化データも同じ形にして、1つの URL が2通りの書き方で出ないようにしている。
+ */
 export function absoluteUrl(path = "/"): string | undefined {
   if (!SITE_URL) return undefined;
-  return path === "/" ? `${SITE_URL}/` : `${SITE_URL}${path}`;
+  return path === "/" ? SITE_URL : `${SITE_URL}${path}`;
 }
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
@@ -49,7 +53,7 @@ export function buildMetadata(args: BuildArgs): Metadata {
       title: args.title,
       description: args.description,
       url,
-      siteName: site.name,
+      siteName: restaurant.name,
       locale: "ja_JP",
       type: args.type ?? "website",
       // images のキーは、値があるときだけ置く。undefined でもキーがあると、
@@ -82,6 +86,6 @@ export function pageMetadata(page: PageDef): Metadata {
     path: page.path,
     keywords: [page.primaryKeyword, ...page.secondaryKeywords],
     ogImage: page.ogImage,
-    ogImageAlt: `${site.name}｜${page.label}`,
+    ogImageAlt: `${restaurant.name}｜${page.label}`,
   });
 }

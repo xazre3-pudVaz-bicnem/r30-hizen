@@ -1,6 +1,6 @@
 # 季節の便り — 毎日1本を自動で書いて公開する
 #
-# 流れ: 題材を選ぶ → Claude に書かせる → 検査 → 通ったら content/journal/ にコミットして push
+# 流れ: 題材を選ぶ（店からのメモ → 優先度 A → B → C） → Claude に書かせる → 検査 → 通ったら content/journal/ にコミットして push
 #       → push を受けて Vercel が自動でビルド・公開（sitemap.xml にも自動で載る）
 #
 # ・検査を通らなかった日は、何もコミットしない（その日は公開しない）。このジョブは失敗として残る
@@ -20,7 +20,7 @@ on:
         type: boolean
         default: false
       topic:
-        description: "題材の id を指定する（data/journal-topics.ts。空欄なら自動で選ぶ）"
+        description: "題材の id を指定する（data/journal-topics.ts か data/shop-notes.ts。空欄なら自動で選ぶ）"
         type: string
         default: ""
       model:

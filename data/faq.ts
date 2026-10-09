@@ -2,14 +2,13 @@
  * よくあるご質問。
  *
  * /reservation の画面表示と、構造化データ（FAQPage）の両方をここから出す（文言の食い違いを作らない）。
- * 答えは data/site.ts と data/courses.ts の値から組み立てる。確認できていないことは問いごと載せない。
+ * 答えは data/restaurant.ts の値から組み立てる。確認できていないことは問いごと載せない。
  */
-import { courses, priceMax, priceMin, yen } from "./courses";
-import { agePolicy, fragrancePolicy, hoursLine, site } from "./site";
+import { agePolicy, courses, fragrancePolicy, hoursLine, priceMax, priceMin, restaurant, yen } from "./restaurant";
 
 export type FaqItem = { q: string; a: string };
 
-const { reservation, seating, payment, hours, tel } = site;
+const { reservation, seats: seating, payment, hours, phone: tel } = restaurant;
 
 export const reservationFaqs: FaqItem[] = [
   {
@@ -18,11 +17,11 @@ export const reservationFaqs: FaqItem[] = [
   },
   {
     q: "一人でも予約できますか？",
-    a: `はい、1名様でもご利用いただけます。Web予約は${reservation.web.partySize}名様限定のため、1名様のご予約はお電話で承ります。`,
+    a: `はい、${reservation.soloLabel}でもご利用いただけます。Web予約は${reservation.web.partyLabel}限定のため、${reservation.soloLabel}のご予約はお電話で承ります。`,
   },
   {
-    q: "3名以上で利用できますか？",
-    a: `3名様以上のご予約は、お電話で承ります。${seating.charter}`,
+    q: `${reservation.groupLabel.replace("様", "")}で利用できますか？`,
+    a: `${reservation.groupLabel}のご予約は、お電話で承ります。${seating.charter}`,
   },
   {
     q: `${agePolicy.minAge}歳未満の同伴者がいても入店できますか？`,

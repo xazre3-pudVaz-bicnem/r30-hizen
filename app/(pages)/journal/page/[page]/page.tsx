@@ -6,12 +6,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JournalIndex, JOURNAL_PER_PAGE, journalPageCount } from "@/components/sections/JournalIndex";
 import { PageHead } from "@/components/sections/PageHead";
-import { ReservationBlock } from "@/components/sections/ReservationBlock";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { pages } from "@/data/pages";
-import { site } from "@/data/site";
+import { restaurant } from "@/data/restaurant";
 import { getAllPosts } from "@/lib/journal";
-import { breadcrumbNode, restaurantNode, webPageNode, websiteNode, type Crumb } from "@/lib/schema";
+import { breadcrumbNode, organizationNode, webPageNode, websiteNode, type Crumb } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ page: string }> };
@@ -37,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const r = resolve(page);
   if (!r) return {};
   return buildMetadata({
-    title: `${pages.journal.label}（${r.n}ページ目）｜${site.name}`,
-    description: `${site.name}の読みもの「${pages.journal.label}」の一覧、${r.n}ページ目です。旬の魚、鮨の仕事、酒との合わせ方について。`,
+    title: `${pages.journal.label}（${r.n}ページ目）｜${restaurant.name}`,
+    description: `${restaurant.name}の読みもの「${pages.journal.label}」の一覧、${r.n}ページ目です。旬の魚、鮨の仕事、酒との合わせ方について。`,
     path: `/journal/page/${r.n}`,
     ogImage: pages.journal.ogImage,
   });
@@ -60,7 +59,7 @@ export default async function JournalPagedPage({ params }: Props) {
     <>
       <JsonLd
         graph={[
-          restaurantNode(),
+          organizationNode(),
           websiteNode(),
           webPageNode({
             path,
@@ -74,7 +73,6 @@ export default async function JournalPagedPage({ params }: Props) {
       />
       <PageHead crumbs={crumbs} label="読みもの" title={`${pages.journal.label}　${r.n}ページ目`} />
       <JournalIndex posts={r.posts} pagination={{ current: r.n, total: r.total }} />
-      <ReservationBlock />
     </>
   );
 }

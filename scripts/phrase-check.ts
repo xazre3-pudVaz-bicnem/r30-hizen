@@ -7,7 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { splitPhrases } from "../components/ui/Phrase";
 import { reservationFaqs } from "../data/faq";
-import { notices } from "../data/site";
+import { notices } from "../data/restaurant";
 import { loadPosts } from "../lib/journal-core";
 
 const found = new Set<string>();
