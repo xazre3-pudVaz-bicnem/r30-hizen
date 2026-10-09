@@ -354,8 +354,9 @@ export const restaurant = {
     opens: "18:00",
     closes: "23:00",
     /**
-     * プロフィールの「Web サイト」は、旧サイトのドメインのまま（2026-10-09 確認）。
-     * 本番（next.config.ts の PRODUCTION_URL）に直してもらう（docs/TODO.md の C）。直ったら、ここも書き換える。
+     * プロフィールの「Web サイト」は、旧サイトを指している（2026-10-09 確認）。
+     * 旧サイトは残す方針なので、どちらを載せるかは店舗の判断（docs/TODO.md の F。新しいサイトを勧めている）。
+     * 変わったら、ここも書き換える。
      */
     website: "https://hizen-susukino.com/",
     placeId: "ChIJAQAceYYpC18Rd4MjGXhtOl4",
@@ -371,8 +372,9 @@ export const restaurant = {
      */
     formerAddressPatterns: ["南5条", "南五条", "南５条", "Nスター", "Ｎスター"],
     /**
-     * 旧公式サイト。新しいサイトとは別のドメインで、2026-10-09 の時点でまだ公開されている。
-     * 新しいドメインへ転送してもらうまで、公式サイトが2つある状態（docs/TODO.md の F）。
+     * 旧公式サイト。新しいサイトとは別のドメインにあり、残したまま運用する方針（2026-10-09）。
+     * 公式サイトが2つある形になる。旧サイトの側で直しておきたいことは docs/TODO.md の F。
+     * 旧サイトの構造化データには移転前の住所が残っているので、直るまでは、こちらの構造化データの sameAs には入れない。
      */
     formerSiteUrl: "https://hizen-susukino.com",
   },

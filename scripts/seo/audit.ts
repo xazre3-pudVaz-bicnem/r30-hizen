@@ -195,8 +195,9 @@ check(
   "営業時間が同じ",
   gbp.opens === restaurant.hours.opens && gbp.closes === restaurant.hours.closes ? [] : [`サイト ${restaurant.hours.opens}〜${restaurant.hours.closes}／GBP ${gbp.opens}〜${gbp.closes}`],
 );
-// GBP に登録の Web サイト：本番のドメインであること。旧サイトのドメインのままのあいだは、落とさずにメモを出す
-// （プロフィールを直すのは店舗。直るまで検査全体を止めない）。どちらでもないドメインなら落とす。
+// GBP に登録の Web サイト：本番のドメインか、旧サイトのドメインであること。どちらでもなければ落とす。
+// 旧サイトは残したまま運用する方針なので、旧サイトを指しているあいだは、落とさずにメモを出す
+// （どちらを載せるかを決めるのは店舗。docs/TODO.md の F）。
 const domainOf = (u: string) => new URL(u).host.replace(/^www\./, "");
 const gbpDomain = domainOf(gbp.website);
 const onProduction = gbpDomain === domainOf(PRODUCTION_URL);
@@ -206,7 +207,7 @@ check(
   onProduction || onFormerSite ? [] : [`GBP「${gbp.website}」／本番 ${PRODUCTION_URL}`],
 );
 if (!onProduction && onFormerSite) {
-  console.log(`       メモ: GBP の Web サイトは旧サイト（${gbp.website}）のまま。本番（${PRODUCTION_URL}）に直してもらう。docs/TODO.md の C を参照`);
+  console.log(`       メモ: GBP の Web サイトは旧サイト（${gbp.website}）を指している。本番（${PRODUCTION_URL}）に替えるかどうかは docs/TODO.md の F を参照`);
 }
 
 console.log(failures === 0 ? "\nすべて通りました。" : `\n${failures} 件の不備があります。`);

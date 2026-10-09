@@ -5,7 +5,7 @@ Next.js（App Router）＋ TypeScript ＋ Tailwind CSS。GitHub に push する�
 
 - 本番: <https://www.hizen-susukino.jp> （www あり。www なしの `hizen-susukino.jp` は、www ありへ転送されます）
 - 確認用: <https://r30-hizen.vercel.app> （本番と同じ内容。検索エンジンには載らない設定）
-- 旧サイト: <https://hizen-susukino.com> （別のドメインで、まだ公開されています。下の「旧サイトからの引き継ぎ」を参照）
+- 旧サイト: <https://hizen-susukino.com> （別のドメイン。残したまま運用する方針です。下の「旧サイトとの併存」を参照）
 - 店舗への確認事項と保留にしていること: [docs/TODO.md](docs/TODO.md)
 - 検索意図マップ（どのページがどの検索語を担当するか）: [docs/KEYWORD_MAP.md](docs/KEYWORD_MAP.md)
 - 全 URL の title・description・h1・canonical の一覧: [docs/URL_INVENTORY.md](docs/URL_INVENTORY.md)
@@ -46,17 +46,16 @@ BASE=https://www.hizen-susukino.jp npm run site:check
 
 Vercel のビルドログに「canonical の向き先が、Vercel につないである本番ドメインと違います」と出たら、`PRODUCTION_URL` を確かめます。
 
-### 旧サイトからの引き継ぎ
+### 旧サイトとの併存
 
-旧サイト（`hizen-susukino.com`）は別のドメインで、2026-10-09 の時点でまだ公開されています。このままだと公式サイトが2つある状態が続き、旧サイトが持っている検索結果での評価や被リンクが、新しいサイトへ移りません。
+旧サイト（`hizen-susukino.com`）は別のドメインにあり、**残したまま運用する方針**です（2026-10-09）。新しいサイトへの転送はしないので、公式サイトが2つある形になります。
 
-1. **旧サイトの URL を、新しいサイトへ 301 で転送する**（旧サイトを管理している会社への依頼になります）。
-   パスを付けたまま `https://www.hizen-susukino.jp/…` へ送ってもらえれば、`/concept.html` `/course.html` `/menu.html` などは、こちらの `LEGACY_REDIRECTS`（`next.config.ts`）が内容の近いページへ 301 で送ります。
-   ドメインごと引き取れる場合は、Vercel のこのプロジェクトに `hizen-susukino.com` を追加して、`www.hizen-susukino.jp` への転送に設定します
-2. Search Console に新しいドメインを追加し、`https://www.hizen-susukino.jp/sitemap.xml` を送信する。
-   所有権の確認タグは旧サイトのものが入っています。新しいドメインで確認できなければ、Search Console に表示されたタグの値を `data/restaurant.ts` の `googleSiteVerification` に入れます。
-   旧サイトのプロパティがある場合は、1 の転送のあとに「アドレス変更」を届け出ます
-3. Google ビジネスプロフィール・一休・食べログ・Instagram にある公式サイトの URL を、新しいドメインに直す（[docs/TODO.md](docs/TODO.md) の C）
+- 旧サイトが持っている検索結果での評価や被リンクは、新しいサイトへは移りません。新しいドメインは、評価のない状態から始まります
+- 旧サイトの側で直しておきたいこと（予約ボタンのリンク切れ、構造化データに残っている移転前の住所）と、Google ビジネスプロフィールの「Web サイト」をどちらにするかは、[docs/TODO.md](docs/TODO.md) の F にまとめてあります
+- Search Console には、新しいドメインを別のプロパティとして登録し、`https://www.hizen-susukino.jp/sitemap.xml` を送信します。
+  所有権の確認タグは旧サイトのものが入っています。新しいドメインで確認できなければ、Search Console に表示されたタグの値を `data/restaurant.ts` の `googleSiteVerification` に入れます
+- `next.config.ts` の `LEGACY_REDIRECTS`（旧サイトの URL → 新しいページ）は、いまは使われません。**将来、旧サイトを閉じることになったとき**のために残してあります。
+  そのときは、閉じる前に、旧サイトの URL をパスを付けたまま `https://www.hizen-susukino.jp/…` へ 301 で転送してもらいます（`/course.html` などは、この表が内容の近いページへ送ります）。ドメインごと引き取れる場合は、Vercel のこのプロジェクトに追加して、`www.hizen-susukino.jp` への転送に設定します
 
 ### 検索エンジンに載る・載らないの決まり
 
