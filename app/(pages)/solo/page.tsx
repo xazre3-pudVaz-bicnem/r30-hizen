@@ -87,7 +87,7 @@ export default function SoloPage() {
               {
                 key: "quiet",
                 title: "静かな店内",
-                body: <p>{agePolicy.audience}の店です。まわりを気にせず、鮨と酒に向き合えます。</p>,
+                body: <p>{agePolicy.summary}。まわりを気にせず、鮨と酒に向き合えます。</p>,
               },
             ]}
           />

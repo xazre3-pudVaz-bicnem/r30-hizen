@@ -1,10 +1,11 @@
 /**
  * 大人の隠れ家
  * 担当する検索語: すすきの 大人 寿司（＋ 隠れ家／静か／落ち着いた）
- * 役割: 騒がしくない大人向けの寿司店を探す人へ、この店が静かである理由（決まりごと）を具体的に示す。
- *       年齢の線引き ／ 香りの決まり ／ 静けさをつくっているもの ／ 隠れ家と呼ばれる場所。
+ * 役割: 騒がしくない大人向けの寿司店を探す人へ、この店が静かである理由（大切にしていること）を具体的に示す。
+ *       年齢の目安 ／ 香りの決まり ／ 静けさをつくっているもの ／ 隠れ家と呼ばれる場所。
  * 書かないこと: 店の成り立ちや考え方は /concept。
- *              年齢・香りの決まりは data/restaurant.ts の agePolicy / fragrancePolicy から出す。
+ *              年齢についての案内・香りの決まりは data/restaurant.ts の agePolicy / fragrancePolicy から出す。
+ *              年齢は「入店不可」「限定」とは書かない（一律に断ってはいない。agePolicy の説明を参照）。
  */
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -49,7 +50,7 @@ export default function AdultSushiPage() {
             <span className="ib">隠れ家寿司。</span>
           </>
         }
-        lead={`にぎやかな街だからこそ、静かな席を。${restaurant.name}が、大人のために設けている決まりごとをご案内します。`}
+        lead={`にぎやかな街だからこそ、静かな席を。${restaurant.name}が、落ち着いて過ごしていただくために大切にしていることをご案内します。`}
         photo={photos.entrance01}
         photoPosition="50% 64%"
       />
@@ -59,14 +60,16 @@ export default function AdultSushiPage() {
           note={
             <>
               <p>
-                {restaurant.name}は、{agePolicy.audience}の鮨店です。{agePolicy.sentence}ご同伴の方も、お子様も同じです。
+                {restaurant.name}は、{agePolicy.audience}の鮨店です。{agePolicy.sentence}
               </p>
-              <p>理由は、{agePolicy.reason}。店内にいるのは、いつも大人だけです。</p>
+              <p>
+                理由は、{agePolicy.reason}。{agePolicy.note}
+              </p>
             </>
           }
         >
-          <span className="ib">{agePolicy.label}、</span>
-          <span className="ib">という線引き。</span>
+          <span className="ib">大人のための、</span>
+          <span className="ib">{agePolicy.guideAge}歳という目安。</span>
         </Statement>
       </Section>
 

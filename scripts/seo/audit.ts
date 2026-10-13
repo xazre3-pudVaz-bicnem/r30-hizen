@@ -138,14 +138,14 @@ const LITERALS = [
   restaurant.address.postalCode,
   ...courses.map((c) => c.price.toLocaleString("ja-JP")),
   ...courses.map((c) => String(c.price)),
-  `${agePolicy.minAge}歳`,
+  `${agePolicy.guideAge}歳`,
   restaurant.hours.opens,
   restaurant.hours.closes,
   sameDayDeadline,
   restaurant.access.primary.walk,
   `${web.partySize}名様`,
   `${web.partySize + 1}名様`,
-  `${restaurant.seats.charterMax}名`,
+  `${restaurant.seats.charterParty.min}〜${restaurant.seats.charterParty.max}名`,
   restaurant.reservation.web.url,
 ];
 const FORMER_ADDRESS = new RegExp(restaurant.legacy.formerAddressPatterns.join("|"));

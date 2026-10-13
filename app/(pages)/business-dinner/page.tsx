@@ -58,7 +58,7 @@ export default function BusinessDinnerPage() {
                 はじめにお伝えします。{restaurant.name}のお席は{restaurant.seats.style}で、個室はございません。
               </p>
               <p>込み入ったお話をする席というより、食事そのものを一緒に楽しんでいただく会食に向いています。目の前で握られる一貫が、そのまま会話の糸口になります。</p>
-              <p>{agePolicy.audience}の店ですので、店内は落ち着いています。ほかのお客様とお席が並ぶことは、あらかじめご承知おきください。</p>
+              <p>{agePolicy.summary}ので、店内は落ち着いています。ほかのお客様とお席が並ぶことは、あらかじめご承知おきください。</p>
             </>
           }
         >
@@ -135,8 +135,12 @@ export default function BusinessDinnerPage() {
             items={[
               {
                 key: "age",
-                title: agePolicy.label,
-                body: <p>ご同席の皆様が{agePolicy.minAge}歳以上であることをご確認ください。</p>,
+                title: agePolicy.heading,
+                body: (
+                  <p>
+                    {agePolicy.sentence}年齢で一律にお断りするものではございませんが、静かにお過ごしいただく店であることを、あらかじめお伝えください。
+                  </p>
+                ),
               },
               {
                 key: "fragrance",

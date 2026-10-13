@@ -24,8 +24,8 @@ export const reservationFaqs: FaqItem[] = [
     a: `${reservation.groupLabel}のご予約は、お電話で承ります。${seating.charter}`,
   },
   {
-    q: `${agePolicy.minAge}歳未満の同伴者がいても入店できますか？`,
-    a: `申し訳ございません。${agePolicy.reason}、${agePolicy.sentence}ご同伴の方も同様です。`,
+    q: `${agePolicy.guideAge}歳未満でも利用できますか？`,
+    a: `当店は、${agePolicy.sentence}${agePolicy.note}`,
   },
   {
     q: "香水をつけて行ってもよいですか？",

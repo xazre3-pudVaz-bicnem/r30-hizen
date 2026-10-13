@@ -32,7 +32,7 @@ export function buildFactSheet(): string {
     `営業時間: ${hoursLine}　定休日: ${restaurant.hours.closedLabel}（決まった曜日の休みは無い）`,
     `アクセス: ${accessLine}／${access.others.map((r) => `${r.line}「${r.station}」から${r.walk}`).join("／")}`,
     `席: ${seats.style}。個室・テーブル席は無い。${seats.smoking}。駐車場は無い`,
-    `入店できる方: ${agePolicy.label}（${agePolicy.audience}）。ご同伴の方も同じ。理由は「${agePolicy.reason}」`,
+    `年齢について: ${agePolicy.sentence}${agePolicy.note}理由は「${agePolicy.reason}」。入店の条件ではない（年齢で一律に断ってはいない）`,
     `香り: ${fragrancePolicy.sentence}`,
     `店と人: ${people.chefExperience}の店主が握る。${people.team}で営んでおり、混み合う時間帯は料理の提供に時間がかかる場合がある`,
     `握りの仕事: ${restaurant.techniques.join("、")}。手間を惜しまず、一貫ずつ、お客様の目の前で握って出す。口に入れるとほどける銀シャリ`,
@@ -109,8 +109,8 @@ export function allowedNumericTokens(extra: string[] = []): Set<string> {
   // 住所に含まれる数（条・丁目・番地・ビル名）
   for (const n of normalizeDigits(addressLine).match(/\d+/g) ?? []) set.add(n);
   // 言い換えとして自然なもの
-  set.add(`${agePolicy.minAge}歳`);
-  set.add(`${agePolicy.minAge}代`);
+  set.add(`${agePolicy.guideAge}歳`);
+  set.add(`${agePolicy.guideAge}代`);
   for (const c of courses) {
     set.add(`${c.price}円`);
     set.add(String(c.price));

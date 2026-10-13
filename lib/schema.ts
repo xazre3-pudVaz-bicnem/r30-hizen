@@ -98,7 +98,7 @@ export function restaurantNode(): Node {
     paymentAccepted: `クレジットカード（${restaurant.payment.cards.join("・")}）、電子マネー`,
     acceptsReservations: true,
     smokingAllowed: false,
-    // 年齢の決まり（30歳未満入店不可）は、Restaurant に使える正式な項目が無いので構造化データには入れない
+    // 年齢についての案内（30歳以上のお客様を中心に）は、Restaurant に使える正式な項目が無いので構造化データには入れない
     // （audience は Restaurant では未定義で、検証器が警告を出す）。画面の本文に明記している。
     hasMenu: absoluteUrl(pages.omakase.path),
     potentialAction: {

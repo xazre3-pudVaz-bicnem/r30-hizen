@@ -94,10 +94,11 @@ export default function SpacePage() {
             items={[
               {
                 key: "age",
-                title: agePolicy.label,
+                title: agePolicy.heading,
                 body: (
                   <p>
-                    {agePolicy.reason}の決まりです。ご同伴の方を含め、{agePolicy.sentence}
+                    {agePolicy.reason}、{agePolicy.sentence}
+                    {agePolicy.note}
                   </p>
                 ),
               },

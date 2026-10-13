@@ -90,7 +90,8 @@ console.log("\n2. 事実シート");
   check("店名が入っている", sheet.includes(restaurant.name));
   check("住所が入っている", sheet.includes(addressLine));
   check("電話番号が入っている", sheet.includes(restaurant.phone.display));
-  check("年齢の決まりが入っている", sheet.includes(agePolicy.label));
+  check("年齢についての案内が入っている", sheet.includes(agePolicy.sentence));
+  check("年齢を「入店不可」「限定」と書いていない", !/入店不可|お客様限定/.test(sheet));
   check("全コースの料金が入っている", courses.every((c) => sheet.includes(c.price.toLocaleString("ja-JP"))));
   check("移転前の住所が入っていない", !FORMER.test(sheet));
   check("確定していない席数が入っていない", !/\d+\s*席/.test(sheet));
@@ -138,7 +139,9 @@ console.log("\n3. 検査（良い原稿は通し、違反は落とす）");
     { name: "架空のサービス（サプライズ演出）", draft: withTail("R-30 hizenでは、記念日のサプライズもお手伝いします。"), code: "fact.unverified" },
     { name: "架空の料理（店の料理として魚の名前）", draft: withTail("R-30 hizenでは、平目の握りを毎日お出ししています。"), code: "fact.dish" },
     { name: "事実に無い数値（営業時間）", draft: withTail("R-30 hizenは、17時から営業しています。"), code: "fact.number" },
-    { name: "年齢の表記ゆれ（30歳以下）", draft: withTail(`R-30 hizenは、${agePolicy.minAge}歳以下の方は入店できません。`), code: "age.wording" },
+    { name: "年齢の表記ゆれ（30歳以下）", draft: withTail(`R-30 hizenは、${agePolicy.guideAge}歳以下の方は入店できません。`), code: "age.wording" },
+    { name: "年齢で断る書き方（入店不可）", draft: withTail(`R-30 hizenは、${agePolicy.guideAge}歳未満入店不可の鮨店です。`), code: "age.wording" },
+    { name: "年齢で断る書き方（〜だけをお迎え）", draft: withTail(`R-30 hizenは、${agePolicy.guideAge}歳以上のお客様だけをお迎えしています。`), code: "age.wording" },
     { name: "移転前の住所", draft: withTail(`以前は${restaurant.legacy.formerAddressPatterns[0]}西4丁目にありました。`), code: "unsupported" },
     { name: "存在しないページへのリンク", draft: withTail("詳しくは[個室のご案内](/private-room)へ。"), code: "link.missing" },
     { name: "サイトの外へのリンク", draft: withTail("詳しくは[こちらのサイト](https://example.com/)へ。"), code: "link.external" },
@@ -178,6 +181,10 @@ console.log("\n3. 検査（良い原稿は通し、違反は落とす）");
   check("店からのメモにある魚の名前は通す", !withMemo.some((p) => p.code === "fact.dish"), withMemo.map((p) => p.code).join(", "));
   const withoutMemo = validateArticle(withTail("R-30 hizenでは今週、平目を昆布〆にしています。"), target, posts);
   check("メモが無ければ、同じ文を落とす", withoutMemo.some((p) => p.code === "fact.dish"));
+
+  // 年齢のやわらかい案内は、そのまま書ける（打ち消しの文を、断る書き方と取り違えない）
+  const softAge = validateArticle(withTail(`R-30 hizenは、${agePolicy.sentence}${agePolicy.note}`), target, posts);
+  check("年齢のやわらかい案内は通す", !softAge.some((p) => p.code === "age.wording"), softAge.map((p) => p.code).join(", "));
 }
 
 // ---------------------------------------------------------------------------

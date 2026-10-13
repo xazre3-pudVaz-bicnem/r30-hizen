@@ -93,7 +93,7 @@ export const topics: Topic[] = [
 
   // ---- 記念日 × 寿司 --------------------------------------------------------
   t("tanjobi-sushi-dinner", "anniversary", "anniversary", "誕生日 寿司 ディナー", ["誕生日 ディナー 札幌 大人", "誕生日 鮨 おまかせ"], "大人の誕生日を鮨で祝う。演出に頼らず、席と料理そのものを贈りものにする考え方。ケーキ等の用意があるとは書かない"),
-  t("kanreki-iwai-sushi", "anniversary", "anniversary", "還暦祝い 寿司", ["還暦 食事 札幌", "還暦祝い 少人数 食事"], `還暦を少人数で祝う席。${agePolicy.label}のため、孫や若い家族が同席する会には向かないことも正直に書く`),
+  t("kanreki-iwai-sushi", "anniversary", "anniversary", "還暦祝い 寿司", ["還暦 食事 札幌", "還暦祝い 少人数 食事"], `還暦を少人数で祝う席。${agePolicy.summary}。落ち着いて過ごす店なので、大勢でにぎやかに祝う会には向かないことも正直に書く`),
   t("shoshin-iwai-sushi", "anniversary", "anniversary", "昇進祝い 食事 寿司", ["昇進祝い ディナー", "お祝い 食事 二人"], "昇進や節目を、家族や親しい人と鮨で祝う夜"),
   t("taishoku-iwai-sushi", "anniversary", "anniversary", "退職祝い 食事 寿司", ["定年 お祝い 食事", "退職祝い 夫婦"], "長く勤めた人をねぎらう食事に鮨を。少人数で落ち着いて過ごす席として"),
   t("kinenbi-yoyaku-itsu", "anniversary", "reservation", "記念日 ディナー 予約 いつ", ["記念日 予約 何日前", "記念日 レストラン 予約 タイミング"], "記念日の予約をいつ入れるか。日にちが動かせない予約の考え方と、予約時に伝えること"),
@@ -110,7 +110,7 @@ export const topics: Topic[] = [
   t("sushi-date-shiharai", "date", "date", "寿司 デート 会計", ["デート 支払い スマート", "寿司 会計 タイミング"], "会計をさりげなく済ませる段取り。カードが使えるかを先に確かめる、など"),
   t("nigiri-tabekata", "date", "counterSushi", "握り寿司 食べ方", ["寿司 食べ方 手 箸", "寿司 醤油 つけ方"], "握りのきれいな食べ方。手か箸か、醤油のつけ方、一口で食べる理由"),
   t("yonjudai-date-sapporo", "date", "date", "40代 デート 札幌", ["大人 デート 札幌 ディナー", "40代 食事 デート 店"], "40代のデートに似合う店の条件。静かさ、料理の質、長居のしやすさ"),
-  t("sushi-date-sasoikata", "date", "date", "寿司 デート 誘い方", ["食事 誘い方 大人", "鮨 誘う 文面"], "鮨に誘うときの言い方と段取り。相手の苦手な食材と年齢の確認を自然に済ませる"),
+  t("sushi-date-sasoikata", "date", "date", "寿司 デート 誘い方", ["食事 誘い方 大人", "鮨 誘う 文面"], "鮨に誘うときの言い方と段取り。相手の苦手な食材の確認を自然に済ませる"),
   t("counter-date-kincho", "date", "counterSushi", "カウンター 寿司 緊張", ["高級寿司 緊張する", "カウンター 慣れない"], "カウンターで緊張してしまう人へ。緊張の正体と、ほぐし方"),
   t("date-aite-nigate", "date", "omakaseSushi", "デート 相手 苦手な食べ物 聞き方", ["食事 苦手なもの 確認", "デート 店選び アレルギー"], "相手の苦手な食材を、失礼なく先に聞く方法。おまかせに誘う前の一手間"),
   t("susukino-date-fuyu", "date", "date", "すすきの デート 冬", ["札幌 冬 デート 夜", "冬 デート 屋内 札幌"], "冬のすすきのでのデート。寒さを避けた動線と、温まる食事の順番", [12, 1, 2]),
@@ -200,12 +200,12 @@ export const topics: Topic[] = [
   t("shime-parfait-sushi", "sapporo", "access", "締めパフェ 鮨のあと", ["札幌 締めパフェ とは", "すすきの 食後 過ごし方"], "鮨のあとに締めパフェ、という札幌らしい夜の流れ。特定の店名は挙げない"),
 
   // ---- R-30 hizenについて ---------------------------------------------------
-  t("r30-hizen-nenrei", "hizen", "concept", "R-30 hizen 年齢制限", [`R-30 hizen ${agePolicy.minAge}歳未満`, "R-30 hizen 年齢 入店"], "年齢のきまりについて。公式に示している理由だけを書き、推測で理由を足さない"),
+  t("r30-hizen-nenrei", "hizen", "concept", "R-30 hizen 年齢制限", [`R-30 hizen ${agePolicy.guideAge}歳未満`, "R-30 hizen 年齢 入店"], `年齢についての案内。「${agePolicy.sentence}」「年齢で一律に断ってはいない」「落ち着いて過ごしていただきたい」という店の案内だけを書き、推測で理由や条件を足さない。「入店不可」「限定」とは書かない`),
   t("r30-hizen-kaori", "hizen", "concept", "R-30 hizen 香水", ["R-30 hizen 柔軟剤", "寿司屋 香水 お断り"], "香りのお願いについて。鮨と香りの関係から説明する"),
   t("r30-hizen-sanshokudon", "hizen", "cuisine", "R-30 hizen 三食丼", ["雲丹 いくら 毛蟹 丼", "R-30 hizen 名物"], "結びの一品について。雲丹・いくら・毛蟹という三つの素材の取り合わせを、味の重なりから書く"),
   t("r30-hizen-toujitsu", "hizen", "reservation", "R-30 hizen 当日", ["R-30 hizen 当日予約 何時まで", "R-30 hizen 電話"], "当日のご予約について。締め切りの時刻、電話のかけ方、伝えること"),
   t("r30-hizen-shiharai", "hizen", "access", "R-30 hizen 支払い", ["R-30 hizen カード", "R-30 hizen 電子マネー"], "お支払い方法について。使えるカードと電子マネー。QRコード決済については書かない"),
-  t("r30-hizen-kashikiri", "hizen", "businessDinner", "R-30 hizen 貸切", ["R-30 hizen 人数", "すすきの 寿司 貸切 相談"], "貸切のご相談について。人数の上限と相談の窓口だけを書き、料金や条件は書かない"),
+  t("r30-hizen-kashikiri", "hizen", "businessDinner", "R-30 hizen 貸切", ["R-30 hizen 人数", "すすきの 寿司 貸切 相談"], "貸切のご相談について。承る人数と相談の窓口だけを書き、料金や条件は書かない"),
   t("r30-hizen-iten", "hizen", "access", "R-30 hizen 移転", ["R-30 hizen 場所 どこ", "R-30 hizen 新しい住所"], "移転後の現在の場所の案内。以前の住所は書かない（古い情報との混同を避けるため）。現在の住所と行き方だけ"),
   t("r30-hizen-fufu", "hizen", "concept", "R-30 hizen 夫婦", ["夫婦 営む 寿司 すすきの", "R-30 hizen どんな店"], "夫婦二人で営む店であること。そのために提供に時間をいただく場合があること"),
   t("r30-hizen-short-course", "hizen", "omakase", "R-30 hizen ショートコース", ["R-30 hizen 9品", "すすきの 寿司 短時間 コース"], "おまかせショートコースについて。品数・内容・時間と、向いている夜"),

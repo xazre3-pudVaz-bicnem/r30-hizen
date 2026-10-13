@@ -67,14 +67,15 @@ Vercel のビルドログに「canonical の向き先が、Vercel につない�
 
 ## 店舗の情報を直すとき
 
-**店名・住所・電話番号・営業時間・年齢の決まり・予約の決まり・コースの料金は、`data/restaurant.ts` の1ファイルにしかありません。**
+**店名・住所・電話番号・営業時間・年齢についての案内・予約の決まり・コースの料金は、`data/restaurant.ts` の1ファイルにしかありません。**
 ページや部品のファイル、自動投稿の指示文に直接書かないでください（書くと `npm run seo:audit` が止めます）。
 このファイルを直せば、画面の表示、構造化データ（JSON-LD）、自動投稿に渡す「店の事実」が、まとめて変わります。
 
 | 直したいもの | 場所 |
 | --- | --- |
 | 店名・住所・電話番号・営業時間・アクセス・座標・予約先・席・お支払い・お知らせ | `data/restaurant.ts` → `restaurant` / `notices` |
-| 年齢の決まり（30歳未満入店不可）・香りの決まり | `data/restaurant.ts` → `agePolicy` / `fragrancePolicy` |
+| 年齢についての案内（30歳以上のお客様を中心に。「入店不可」「限定」とは書かない）・香りの決まり | `data/restaurant.ts` → `agePolicy` / `fragrancePolicy` |
+| 貸切で承る人数 | `data/restaurant.ts` → `CHARTER_PARTY`（`restaurant.seats.charter` に反映） |
 | コースの名前・料金・品数・内容・滞在時間 | `data/restaurant.ts` → `courses` |
 | Google ビジネスプロフィールの登録内容（突き合わせ用） | `data/restaurant.ts` → `restaurant.googleBusinessProfile` |
 | よくあるご質問（画面と構造化データの両方） | `data/faq.ts` |

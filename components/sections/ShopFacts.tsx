@@ -109,7 +109,7 @@ export function ShopFacts({ variant = "full" }: { variant?: "full" | "short" }) 
           </div>
           <div>
             <dt>ご利用</dt>
-            <dd>{agePolicy.label}</dd>
+            <dd>{agePolicy.summary}</dd>
           </div>
           <div>
             <dt>貸切</dt>

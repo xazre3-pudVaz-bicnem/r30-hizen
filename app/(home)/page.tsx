@@ -72,7 +72,7 @@ export default function HomePage() {
                 {restaurant.people.chefExperience}の店主が、その日の仕入れを見て握る寿司と、季節の一皿。握りは一貫ずつ、目の前からお出しします。お料理は、おまかせのコースだけをご用意しています。
               </p>
               <p>
-                お迎えするのは、{agePolicy.minAge}歳以上のお客様だけ。すすきので寿司を、静かに、ゆっくり味わいたい夜に。記念日や大切な方との会食、札幌を訪れた夜にも、どうぞ。
+                {agePolicy.guideAge}歳からの大人に、落ち着いた時間を。すすきので寿司を、静かに、ゆっくり味わいたい夜に。記念日や大切な方との会食、札幌を訪れた夜にも、どうぞ。
               </p>
             </div>
           </div>
@@ -83,12 +83,12 @@ export default function HomePage() {
           <PhotoEdge photo={photos.entrance01} side="left" width="narrow" ratio="3/4" ratioSp="4/5" position="50% 62%">
             <p className="label">{pages.concept.label}</p>
             <h2 className="t-h2 mt-5">
-              <span className="ib">{agePolicy.minAge}歳から、</span>
-              <span className="ib">と決めた店。</span>
+              <span className="ib">{agePolicy.guideAge}歳からの、</span>
+              <span className="ib">大人のための店。</span>
             </h2>
             <Body className="measure mt-9">
               <p>
-                {restaurant.name}は、{agePolicy.minAge}歳未満のお客様のご入店をお断りしています。{agePolicy.reason}の、決まりごとです。
+                {restaurant.name}は、{agePolicy.summary}。{agePolicy.reason}に、大切にしていることです。
               </p>
               <p>
                 香りの強い香水もご遠慮いただき、灯りを落としたカウンターで、握りと酒に向き合っていただく。{restaurant.people.team}で営む小さな店だからできる、大人のための時間をご用意しています。

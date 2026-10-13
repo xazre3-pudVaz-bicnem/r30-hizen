@@ -129,19 +129,19 @@ export default function SusukinoSushiPage() {
           note={
             <>
               <p>
-                三つめは、静けさです。{restaurant.name}は{agePolicy.audience}。{agePolicy.reason}の決まりです。
+                三つめは、静けさです。{restaurant.name}は、{agePolicy.summary}。{agePolicy.reason}です。
               </p>
               <p>{fragrancePolicy.sentence}</p>
               <p>
                 <Link href={pages.adultSushi.path} className="more">
-                  大人のための決まりごと
+                  静かに過ごしていただくために
                 </Link>
               </p>
             </>
           }
         >
           <span className="ib">{agePolicy.label}。</span>
-          <span className="ib">香りにも、決まりがあります。</span>
+          <span className="ib">香りには、決まりがあります。</span>
         </Statement>
       </Section>
 

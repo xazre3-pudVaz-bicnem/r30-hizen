@@ -39,7 +39,7 @@ export default function AnniversaryPage() {
     },
     {
       q: "個室はありますか？",
-      a: `個室はございません。お席は${restaurant.seats.style}です。${agePolicy.audience}のため、まわりのお席も大人のお客様だけです。`,
+      a: `個室はございません。お席は${restaurant.seats.style}です。${agePolicy.summary}ので、店内は落ち着いています。`,
     },
     {
       q: "服装の決まりはありますか？",
@@ -83,7 +83,7 @@ export default function AnniversaryPage() {
             <p>品書きがないので、何を頼むかに気を取られません。次の一皿を二人で待つ、その時間ごと記念日になります。</p>
             <p>席は、横に並ぶカウンター。向かい合うより近く、目の前の仕事を一緒に眺めていられます。</p>
             <p>
-              {restaurant.name}は{agePolicy.audience}。まわりのお席も、大人のお客様だけです。静かな店内で、ゆっくりと言葉を交わしていただけます。
+              {restaurant.name}は、{agePolicy.audience}の鮨店。静かな店内で、ゆっくりと言葉を交わしていただけます。
             </p>
           </Body>
         </Column>
@@ -148,8 +148,13 @@ export default function AnniversaryPage() {
               },
               {
                 key: "age",
-                title: agePolicy.label,
-                body: <p>お二人とも{agePolicy.minAge}歳以上であることをご確認ください。</p>,
+                title: agePolicy.heading,
+                body: (
+                  <p>
+                    {agePolicy.sentence}
+                    {agePolicy.note}
+                  </p>
+                ),
               },
             ]}
           />

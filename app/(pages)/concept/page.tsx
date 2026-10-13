@@ -40,7 +40,7 @@ export default function ConceptPage() {
             <span className="ib">隠れ家鮨。</span>
           </>
         }
-        lead={`すすきのの一角、ビルの${restaurant.address.floorText}。${restaurant.name}は、${agePolicy.minAge}歳以上のお客様だけをお迎えする鮨店です。`}
+        lead={`すすきのの一角、ビルの${restaurant.address.floorText}。${restaurant.name}は、${agePolicy.audience}の鮨店です。`}
         photo={photos.chef01}
         photoPosition="46% 40%"
       />
@@ -49,14 +49,17 @@ export default function ConceptPage() {
         <Split
           heading={
             <>
-              <span className="ib">{agePolicy.minAge}歳から、</span>
-              <span className="ib">という決まり。</span>
+              <span className="ib">{agePolicy.guideAge}歳から、</span>
+              <span className="ib">という目安。</span>
             </>
           }
         >
           <Body>
-            <p>店名に掲げた「R-30」のとおり、{agePolicy.sentence}ご同伴の方も同じです。</p>
-            <p>{agePolicy.reason}に設けた決まりです。リラックスしてお食事していただけるよう、落ち着いた雰囲気でお迎えします。</p>
+            <p>
+              店名に掲げた「R-30」のとおり、{agePolicy.sentence}
+              {agePolicy.note}
+            </p>
+            <p>{agePolicy.reason}の目安です。リラックスしてお食事していただけるよう、落ち着いた雰囲気でお迎えします。</p>
             <p>あわせて、香りについてもお願いがあります。{fragrancePolicy.sentence}</p>
           </Body>
         </Split>

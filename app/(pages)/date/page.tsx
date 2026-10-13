@@ -128,10 +128,11 @@ export default function DatePage() {
               items={[
                 {
                   key: "age",
-                  title: agePolicy.label,
+                  title: agePolicy.heading,
                   body: (
                     <p>
-                      お二人とも{agePolicy.minAge}歳以上であることをご確認ください。{agePolicy.sentence}
+                      {agePolicy.sentence}
+                      {agePolicy.note}
                     </p>
                   ),
                 },

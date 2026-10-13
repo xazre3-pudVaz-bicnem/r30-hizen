@@ -176,6 +176,29 @@ function factTerms(): string[] {
 
 const SHOP_NAME = /R-?30\s?hizen|hizen|ヒゼン/i;
 
+/**
+ * 年齢について、一律に断っているように読める言い回しを探す。見つかれば、その部分を返す。
+ * 「一律にお断りするものではございません」のような打ち消しの文は、対象にしない。
+ */
+export function ageBanPhrase(text: string): string | undefined {
+  const G = agePolicy.guideAge;
+  const NEGATED = /一律に|わけでは|ものでは|ではございません|ではありません/;
+  const BAN = [
+    new RegExp(`${G}歳以下`),
+    new RegExp(`${G}歳未満[^。\\n]{0,24}(入店不可|不可|入店でき|ご入店いただけ|入れません|入れない|お断り|ご遠慮|お迎えして(い|おり)ません)`),
+    new RegExp(`${G}歳以上[^。\\n]{0,16}(限定|だけ|のみ|に限)`),
+    new RegExp(`${G}歳以上であること`),
+  ];
+  for (const sentence of text.split(/(?<=[。！？\n])/)) {
+    if (NEGATED.test(sentence)) continue;
+    for (const re of BAN) {
+      const m = sentence.match(re);
+      if (m) return m[0];
+    }
+  }
+  return undefined;
+}
+
 /** 本文を、見出し（h2）ごとの区画と段落に分ける */
 function blocks(body: string): { heading: string; paragraphs: string[] }[] {
   const out: { heading: string; paragraphs: string[] }[] = [{ heading: "", paragraphs: [] }];
@@ -362,8 +385,10 @@ export function validateArticle(
     const m = all.match(re);
     if (m) add("unsupported", `根拠を示せない表現: ${label}（「${m[0]}」）`);
   }
-  if (new RegExp(`${agePolicy.minAge}歳以下`).test(normalizeDigits(all))) {
-    add("age.wording", `年齢の表記は「${agePolicy.label}」。「${agePolicy.minAge}歳以下」と書かない（意味が変わる）`);
+  // 年齢：一律に断っているような書き方をしない（data/restaurant.ts の agePolicy の説明を参照）
+  const ageBan = ageBanPhrase(normalizeDigits(all));
+  if (ageBan) {
+    add("age.wording", `年齢で一律に断っているような書き方（「${ageBan}」）。案内は「${agePolicy.sentence}」。入店不可・限定・お断りとは書かない`);
   }
   // 金額は、コースの料金だけ
   const yenOk = new Set(allowedYen());
