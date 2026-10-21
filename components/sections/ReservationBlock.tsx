@@ -12,6 +12,29 @@ type Props = {
 };
 
 /**
+ * Web予約の窓口のボタン（一休.comレストラン・食べログ）。縦に並べ、幅は長いほうに揃える。
+ * 窓口は data/restaurant.ts の reservation.web.services から出す。
+ * 狭い画面では左右の余白を詰めて1行に収める。収まらない幅（320px）では「〜で／予約する」で折り返す。
+ */
+export function WebReserveLinks({ className = "" }: { className?: string }) {
+  return (
+    <ul className={`grid w-fit max-w-full gap-3 ${className}`}>
+      {restaurant.reservation.web.services.map((s) => (
+        <li key={s.id} className="grid">
+          <a href={s.url} target="_blank" rel="noopener noreferrer" className="action max-sm:px-5">
+            <span>
+              <span className="ib">{s.label}で</span>
+              <span className="ib">予約する</span>
+            </span>
+            <span className="sr-only">（別のタブで開きます）</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
  * 予約の導線。電話と Web 予約の2つだけ。
  *
  * 置く場所は1ページに1か所（ページの終わり。コースのページだけは、コースを見終えた位置）。
@@ -54,15 +77,8 @@ export function ReservationBlock({ lead, hideGuideLink, headingId = "reserve-hea
 
           <div className="py-9 lg:py-11">
             <p className="label">Web予約</p>
-            <p className="mt-5">
-              <a href={web.url} target="_blank" rel="noopener noreferrer" className="action">
-                Webで席を予約する
-                <span className="sr-only">（{web.label}が別のタブで開きます）</span>
-              </a>
-            </p>
-            <p className="t-note mt-5">
-              {web.partyLabel}でのご利用に限ります（{web.label}）。
-            </p>
+            <WebReserveLinks className="mt-5" />
+            <p className="t-note mt-5">いずれも{web.partyLabel}でのご利用に限ります。</p>
           </div>
         </Reveal>
       </div>

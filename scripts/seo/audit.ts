@@ -146,7 +146,7 @@ const LITERALS = [
   `${web.partySize}名様`,
   `${web.partySize + 1}名様`,
   `${restaurant.seats.charterParty.min}〜${restaurant.seats.charterParty.max}名`,
-  restaurant.reservation.web.url,
+  ...restaurant.reservation.web.services.map((s) => s.url),
 ];
 const FORMER_ADDRESS = new RegExp(restaurant.legacy.formerAddressPatterns.join("|"));
 /** コメントを外す（説明のために値を書いているコメントは対象にしない） */

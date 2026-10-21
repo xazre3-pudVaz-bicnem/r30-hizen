@@ -6,12 +6,14 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import { Section, Split } from "@/components/sections/Blocks";
 import { CourseRows } from "@/components/sections/CourseRows";
 import { FaqList } from "@/components/sections/FaqList";
 import { NoticeList } from "@/components/sections/NoticeList";
 import { Onward } from "@/components/sections/Onward";
 import { PageHead } from "@/components/sections/PageHead";
+import { WebReserveLinks } from "@/components/sections/ReservationBlock";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { reservationFaqs } from "@/data/faq";
 import { pages } from "@/data/pages";
@@ -60,15 +62,19 @@ export default function ReservationPage() {
 
           <div className="border-t border-line py-11 max-lg:border-b lg:py-14">
             <h2 className="label">Web予約</h2>
-            <p className="mt-6">
-              <a href={web.url} target="_blank" rel="noopener noreferrer" className="action">
-                Webで席を予約する
-                <span className="sr-only">（{web.label}が別のタブで開きます）</span>
-              </a>
-            </p>
+            <WebReserveLinks className="mt-6" />
             <ul className="mt-7 space-y-2">
               <li>{web.partyLabel}でのご利用に限ります</li>
-              <li>ご予約は{web.label}のページで承ります</li>
+              <li>
+                ご予約は
+                {web.services.map((s, i) => (
+                  <Fragment key={s.id}>
+                    {i > 0 && "、または"}
+                    <span className="ib">{s.label}</span>
+                  </Fragment>
+                ))}
+                のページで承ります
+              </li>
             </ul>
             <p className="t-note mt-6">{notAccepted}経由のご予約は、お受けしておりません。</p>
           </div>

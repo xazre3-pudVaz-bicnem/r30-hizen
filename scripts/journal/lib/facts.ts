@@ -49,7 +49,8 @@ export function buildFactSheet(): string {
 
   lines.push(
     `結びの一品: ${signatureDish.label}。${restaurant.name}の名物。${coursesWithSignatureDish.map((c) => c.name).join("と")}の最後に出る`,
-    `予約の方法: お電話、またはWeb予約（${reservation.web.label}）。Web予約は${reservation.web.partyLabel}限定。${reservation.phoneOnlyParties}はお電話`,
+    // 予約サイトの名前（食べログなど）は、記事の検査でグルメサイト名として止まるので渡さない
+    `予約の方法: お電話、またはWeb予約。Web予約の窓口は ${reservation.web.services.length} つの予約サイトで、/reservation にまとめている（記事では予約サイトの名前を出さず、/reservation へ案内する）。Web予約は${reservation.web.partyLabel}限定。${reservation.phoneOnlyParties}はお電話`,
     `当日予約: ${reservation.sameDayDeadline}まで受け付ける`,
     `受け付けていない予約: ${reservation.notAccepted}経由の予約`,
     "食材の変更: 当日の食材の変更はできない。アレルギーは予約のときに伝える。苦手な食材の差し替えはしない",

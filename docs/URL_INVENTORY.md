@@ -1,6 +1,6 @@
 # 全 URL の一覧
 
-2026-10-13 に、ビルドした HTML から取り出したもの（`npm run site:check -- --inventory`）。
+2026-10-21 に、ビルドした HTML から取り出したもの（`npm run site:check -- --inventory`）。
 
 - ページ数: 37（固定 17／記事 10／分類 10）
 - title・description・h1 の重複: なし（重複があると `npm run site:check` が止めます）

@@ -103,12 +103,13 @@ export function restaurantNode(): Node {
     hasMenu: absoluteUrl(pages.omakase.path),
     potentialAction: {
       "@type": "ReserveAction",
-      target: {
+      // Web予約の窓口ごとに1つ（一休・食べログ）
+      target: restaurant.reservation.web.services.map((s) => ({
         "@type": "EntryPoint",
-        urlTemplate: restaurant.reservation.web.url,
+        urlTemplate: s.url,
         inLanguage: "ja",
         actionPlatform: ["https://schema.org/DesktopWebPlatform", "https://schema.org/MobileWebPlatform"],
-      },
+      })),
       result: { "@type": "FoodEstablishmentReservation", name: "席のご予約" },
     },
     sameAs,

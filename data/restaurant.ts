@@ -10,7 +10,7 @@
  *   [HP]   旧公式サイト hizen-susukino.com の画面表示（2026-10-07 に確認）
  *   [GBP]  Google ビジネスプロフィールの公開情報（2026-10-09 に再確認。店名・住所・電話・営業時間が一致。Web サイトの欄だけ旧サイトのまま）
  *   [一休] 店舗の予約ページ restaurant.ikyu.com/154941（公式 Instagram のプロフィールからリンクされている）
- *   [食べ] 食べログの店舗掲載（突き合わせにだけ使用。料金は転載していない）
+ *   [食べ] 食べログの店舗掲載（突き合わせと、Web予約の窓口として使用。料金は転載していない）
  */
 
 /** 内容を確かめた日。料金・営業時間・コースの内容を直したら、この日付も更新する。 */
@@ -176,6 +176,22 @@ const WEB_PARTY_SIZE = 2;
  * 旧公式サイトの「貸切 20人以下可」は、いまの店には当てはまらない。
  */
 const CHARTER_PARTY = { min: 6, max: 7 } as const;
+/** 店舗自身の掲載ページ。Web予約の窓口（reservation.web.services）と JSON-LD の sameAs の両方で使う */
+const LISTINGS = {
+  ikyu: "https://restaurant.ikyu.com/154941",
+  tabelog: "https://tabelog.com/hokkaido/A0101/A010102/1085254/",
+} as const;
+/**
+ * Web予約の窓口。この順にボタンを並べる。
+ * ・一休：旧公式サイトのボタンは restaurant.ikyu.com/122140/?ikgo=2 を指していたが、2026-10-07 時点で 404。
+ *   公式 Instagram のプロフィールにある 154941 が現在の掲載ページ（店名・住所・電話番号が一致）
+ * ・食べログ：2026-10-21、店舗からの連絡で加えた。掲載ページでネット予約（リクエスト予約・2名様のコース）を受けている
+ * 窓口を足す・外すときは、ここだけを直す（ボタン・文言・構造化データ・検査が、すべてここを見る）
+ */
+const WEB_SERVICES = [
+  { id: "ikyu", label: "一休.comレストラン", url: LISTINGS.ikyu },
+  { id: "tabelog", label: "食べログ", url: LISTINGS.tabelog },
+] as const;
 
 export const restaurant = {
   name: "R-30 hizen",
@@ -275,11 +291,10 @@ export const restaurant = {
   // ---------------------------------------------------------------------------
   reservation: {
     web: {
-      label: "一休.comレストラン",
-      // 旧公式サイトのボタンは restaurant.ikyu.com/122140/?ikgo=2 を指していたが、2026-10-07 時点で 404。
-      // 公式 Instagram のプロフィールにある 154941 が現在の掲載ページ（店名・住所・電話番号が一致）。
-      // TODO(要確認): Web予約の窓口を変えたときは、この url だけを差し替える。
-      url: "https://restaurant.ikyu.com/154941",
+      /** 窓口（上の WEB_SERVICES を参照） */
+      services: WEB_SERVICES,
+      /** 文の中で窓口をまとめて言うとき。一休.comレストラン・食べログ */
+      label: WEB_SERVICES.map((s) => s.label).join("・"),
       /** [HP]「ネット予約は2名限定です。1名や3名以上はお電話にて対応しております」 */
       partySize: WEB_PARTY_SIZE,
       /** 2名様 */
@@ -343,10 +358,7 @@ export const restaurant = {
     instagram: "https://www.instagram.com/hizen_susukino_/",
   },
   /** 店舗自身の掲載ページ（JSON-LD の sameAs に入れる） */
-  listings: {
-    ikyu: "https://restaurant.ikyu.com/154941",
-    tabelog: "https://tabelog.com/hokkaido/A0101/A010102/1085254/",
-  },
+  listings: LISTINGS,
   /** 店舗紹介の映像（旧公式サイトのトップに置かれていた YouTube 動画） */
   video: {
     youtubeId: "dLlaQU6p51k",

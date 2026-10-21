@@ -331,9 +331,11 @@ async function main() {
     const missing = [...allowed].filter((h) => !hrefs.includes(h));
     if (extra.length) navProblems.push(`${p.path}: ヘッダーに余分なリンク ${extra.join(", ")}`);
     if (missing.length) navProblems.push(`${p.path}: ヘッダーに無いリンク ${missing.join(", ")}`);
-    // 予約の行動（Web予約へのボタン）は、1ページに1か所まで
-    const web = (p.main.match(new RegExp(`href="${restaurant.reservation.web.url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`, "g")) ?? []).length;
-    if (web > 1) ctaProblems.push(`${p.path}: Web予約のボタンが ${web} か所`);
+    // 予約の行動（Web予約へのボタン）は、1ページに1か所まで（窓口ごとに数える）
+    for (const s of restaurant.reservation.web.services) {
+      const web = p.main.split(`href="${s.url}"`).length - 1;
+      if (web > 1) ctaProblems.push(`${p.path}: Web予約（${s.label}）のボタンが ${web} か所`);
+    }
     if (/position:\s*fixed|class="[^"]*\bfixed\b[^"]*"/.test(p.main)) ctaProblems.push(`${p.path}: 本文に固定表示の要素がある`);
   }
   check(`ヘッダーのメニューは ${navWanted.length} 項目＋ご予約だけ`, navProblems);

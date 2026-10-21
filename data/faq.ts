@@ -53,6 +53,6 @@ export const reservationFaqs: FaqItem[] = [
   },
   {
     q: `${reservation.notAccepted}から予約できますか？`,
-    a: `${reservation.notAccepted}経由のご予約は、一切お受けしておりません。お電話または${reservation.web.label}のWeb予約をご利用ください。`,
+    a: `${reservation.notAccepted}経由のご予約は、一切お受けしておりません。お電話、またはWeb予約（${reservation.web.label}）をご利用ください。`,
   },
 ];
